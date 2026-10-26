@@ -37,12 +37,13 @@ function escapeHtml(s: string) {
 
 /** The stored HTML plus a noindex tag and a small "Free preview by …" footer. */
 export async function renderMockup(slug: string) {
-  const mockup = await prisma.mockup.findUnique({ where: { slug } });
+  const mockup = await prisma.mockup.findUnique({ where: { slug }, include: { lead: { select: { businessName: true } } } });
   if (!mockup) return null;
   const settings = await getSettings();
-  const by = settings.businessName || settings.yourName || "your web designer";
+  const by = settings.yourName || settings.businessName || "your web designer";
   const meta = '<meta name="robots" content="noindex, nofollow">';
-  const footer = `<div style="position:fixed;left:0;right:0;bottom:0;z-index:2147483647;padding:6px 12px;font:12px/1.4 system-ui,-apple-system,sans-serif;text-align:center;background:rgba(17,17,17,.85);color:#fff">Free preview by ${escapeHtml(by)}</div>`;
+  const forWho = mockup.lead?.businessName ? ` for ${escapeHtml(mockup.lead.businessName)}` : "";
+  const footer = `<div style="height:48px"></div><div style="position:fixed;left:0;right:0;bottom:0;z-index:2147483647;padding:8px 14px;font:13px/1.4 system-ui,-apple-system,sans-serif;text-align:center;background:rgba(17,17,17,.9);color:#fff">Free preview made${forWho} by ${escapeHtml(by)} · <strong>Like it? Just reply to my email and it can be live this week.</strong></div>`;
   let html = mockup.html;
   html = /<head[^>]*>/i.test(html) ? html.replace(/<head[^>]*>/i, (m) => `${m}${meta}`) : `${meta}${html}`;
   html = /<\/body>/i.test(html) ? html.replace(/<\/body>(?![\s\S]*<\/body>)/i, `${footer}</body>`) : `${html}${footer}`;
