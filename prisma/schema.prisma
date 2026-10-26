@@ -1,0 +1,121 @@
+// SQLite has no native enums, so enum-like fields are stored as strings.
+// Allowed values live in src/lib/constants.ts and are validated by the API.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Lead {
+  id            String    @id @default(cuid())
+  businessName  String
+  niche         String    @default("")
+  city          String    @default("")
+  contactName   String    @default("")
+  email         String    @default("")
+  phone         String    @default("")
+  website       String    @default("")
+  websiteStatus String    @default("None") // None | Broken | Not Mobile | Outdated | No HTTPS | OK
+  mainProblem   String    @default("")
+  score         Int       @default(3) // 1-5
+  stage         String    @default("Queued")
+  dateContacted DateTime?
+  mockupUrl     String    @default("")
+  notes         String    @default("")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  emails     Email[]
+  sites      Site[]
+  client     Client?
+  activities Activity[]
+
+  @@index([stage])
+  @@index([city, niche])
+}
+
+model Email {
+  id        String    @id @default(cuid())
+  leadId    String
+  lead      Lead      @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  direction String    @default("outbound") // outbound | inbound
+  type      String    @default("first") // first | followup1 | followup2 | reply | mockup
+  subject   String    @default("")
+  body      String    @default("")
+  sentAt    DateTime?
+  status    String    @default("draft") // draft | sent | opened | replied | bounced | unsubscribed
+  createdAt DateTime  @default(now())
+
+  @@index([leadId])
+  @@index([sentAt])
+}
+
+model Site {
+  id           String   @id @default(cuid())
+  leadId       String
+  lead         Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  type         String   @default("mockup") // mockup | client
+  status       String   @default("Mockup") // Mockup | In Progress | Live
+  previewUrl   String   @default("")
+  liveUrl      String   @default("")
+  thumbnailUrl String   @default("")
+  createdAt    DateTime @default(now())
+
+  @@index([leadId])
+}
+
+model Client {
+  id         String   @id @default(cuid())
+  leadId     String   @unique
+  lead       Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  setupPrice Float    @default(0)
+  monthlyFee Float    @default(0)
+  startDate  DateTime @default(now())
+  status     String   @default("active") // active | paused | cancelled
+}
+
+model Coverage {
+  id         String   @id @default(cuid())
+  city       String
+  niche      String
+  searchedAt DateTime @default(now())
+  leadsFound Int      @default(0)
+}
+
+model Activity {
+  id          String   @id @default(cuid())
+  leadId      String?
+  lead        Lead?    @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  type        String // email_sent | email_received | stage_change | note | lead_created | client_won | ...
+  description String
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+model Template {
+  id        String   @id @default(cuid())
+  key       String   @unique // first | followup1 | followup2 | mockup | custom keys
+  name      String
+  subject   String
+  body      String
+  updatedAt DateTime @updatedAt
+}
+
+model Settings {
+  id             Int      @id @default(1)
+  yourName       String   @default("")
+  businessName   String   @default("")
+  mailingAddress String   @default("")
+  sendingEmail   String   @default("")
+  setupPrice     Float    @default(500)
+  monthlyFee     Float    @default(50)
+  dailyLimit     Int      @default(50) // hard cap; the ramp can only lower it
+  rampStartDate  DateTime @default(now())
+  followup1Days  Int      @default(3)
+  followup2Days  Int      @default(5)
+}

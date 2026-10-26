@@ -1,26 +1,81 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #fafafa;
+  --panel: #ffffff;
+  --panel-2: #f4f4f5;
+  --border: #e4e4e7;
+  --border-strong: #d4d4d8;
+  --fg: #18181b;
+  --muted: #71717a;
+  --accent: #4f46e5;
+  --accent-fg: #ffffff;
+  --ring: rgba(79, 70, 229, 0.35);
+  /* chart roles (dataviz reference palette, light steps) */
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --chart-grid: #e7e7ea;
+  --chart-axis: #8a8a93;
+}
+
+.dark {
+  --bg: #09090b;
+  --panel: #111113;
+  --panel-2: #18181b;
+  --border: #232327;
+  --border-strong: #303036;
+  --fg: #ededef;
+  --muted: #8b8b94;
+  --accent: #6d6af5;
+  --accent-fg: #ffffff;
+  --ring: rgba(109, 106, 245, 0.45);
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --chart-grid: #232327;
+  --chart-axis: #77777f;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-panel: var(--panel);
+  --color-panel-2: var(--panel-2);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  color-scheme: light;
+}
+html.dark {
+  color-scheme: dark;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Recharts: hide the default focus outline on the svg wrapper */
+.recharts-wrapper:focus,
+.recharts-surface:focus {
+  outline: none;
+}
+
+.scrollbar-thin {
+  scrollbar-width: thin;
 }
