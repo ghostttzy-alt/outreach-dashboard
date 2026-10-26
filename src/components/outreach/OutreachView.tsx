@@ -4,11 +4,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AlertTriangle, Clock, Mail, PenLine, ShieldAlert } from "lucide-react";
-import { EMAIL_TYPE_LABELS, RAMP } from "@/lib/constants";
+import { EMAIL_TYPE_LABELS } from "@/lib/constants";
 import type { EmailDTO, LeadDTO, SettingsDTO, TemplateDTO } from "@/lib/types";
 import { cn, formatDate } from "@/lib/utils";
 import { Button, Card, CardHeader, PageHeader, Score, WebsiteBadge } from "@/components/ui";
-import { useConfirm } from "@/components/confirm";
 import { EmailComposer } from "@/components/EmailComposer";
 import { TemplatesLibrary } from "./TemplatesLibrary";
 
@@ -21,7 +20,12 @@ type Data = {
     outbound: number;
     bounced: number;
     bounceRate: number;
+    sent7d: number;
+    bounced7d: number;
     unsubscribed: number;
+    gmailConnected: boolean;
+    blockers: string[];
+    nextSendAt: string | null;
   };
   settings: SettingsDTO;
   drafts: (EmailDTO & { lead: LeadDTO })[];
@@ -35,23 +39,22 @@ type QueueItem = { key: string; lead: LeadDTO; label: string; detail: string; dr
 
 export function OutreachView({ data }: { data: Data }) {
   const router = useRouter();
-  const confirm = useConfirm();
   const { send, settings } = data;
   const [composer, setComposer] = useState<{ lead: LeadDTO; draft?: EmailDTO; type: string } | null>(null);
 
   const queue: QueueItem[] = [
     ...data.drafts.map((d) => ({
       key: d.id, lead: d.lead, draft: d, type: d.type,
-      label: `${EMAIL_TYPE_LABELS[d.type]} · draft ready`, detail: d.subject,
+      label: `${EMAIL_TYPE_LABELS[d.type]} · ${d.status === "approved" ? "approved, sending soon" : "waiting for your approval"}`, detail: d.subject,
     })),
     ...data.followUps.map((f) => ({
       key: `fu-${f.lead.id}`, lead: f.lead, type: f.next,
-      label: `${EMAIL_TYPE_LABELS[f.next]} due`,
+      label: `${EMAIL_TYPE_LABELS[f.next]} due · the daily session will write it`,
       detail: f.overdueDays > 0 ? `${f.overdueDays} day(s) overdue · last sent ${formatDate(f.lastSentAt)}` : `Due today · last sent ${formatDate(f.lastSentAt)}`,
     })),
     ...data.queuedNoDraft.map((l) => ({
       key: `q-${l.id}`, lead: l, type: "first",
-      label: "First touch · needs writing", detail: l.mainProblem,
+      label: "First email · not written yet", detail: l.mainProblem,
     })),
   ];
 
@@ -60,29 +63,23 @@ export function OutreachView({ data }: { data: Data }) {
   const bounceBad = send.bounceRate > 5;
 
   const open = async (item: QueueItem) => {
-    if (send.remainingToday <= 0) {
-      const ok = await confirm({
-        title: "Daily limit reached",
-        message: `You've sent ${send.sentToday} of ${send.ramp.limit} today (ramp week ${send.ramp.week}). Sending more can hurt deliverability. Continue anyway?`,
-        confirmLabel: "Continue",
-      });
-      if (!ok) return;
-    }
+    if (item.draft) return router.push("/queue");
     setComposer({ lead: item.lead, draft: item.draft, type: item.type });
   };
+  const RAMP = settings.rampSchedule;
 
   return (
     <>
-      <PageHeader title="Outreach" description="Today's sending queue, limits and templates" />
+      <PageHeader title="Outreach" description="Sending limits, deliverability and what's in the pipeline" />
 
       {send.overLimit && (
         <Banner tone="red" icon={AlertTriangle} title={`Over today's limit: ${send.sentToday} sent, limit is ${send.ramp.limit}`}>
-          Stop sending for today to protect your domain&apos;s reputation.
+          The sender stops automatically at the limit; the rest go out tomorrow.
         </Banner>
       )}
       {bounceBad && (
-        <Banner tone="red" icon={ShieldAlert} title={`Bounce rate is ${send.bounceRate}% (above 5%)`}>
-          Verify email addresses before sending more. High bounce rates get sending domains flagged.
+        <Banner tone="red" icon={ShieldAlert} title={`Bounce rate is ${send.bounceRate}% over the last 7 days (above 5%)`}>
+          Sending pauses automatically. Verify email addresses before resuming in Settings.
         </Banner>
       )}
 
@@ -135,10 +132,10 @@ export function OutreachView({ data }: { data: Data }) {
               <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-panel-2">
                 <div className={cn("h-full rounded-full", bounceBad ? "bg-red-500" : "bg-emerald-500")} style={{ width: `${Math.min(100, send.bounceRate * 10)}%` }} />
               </div>
-              <p className="mt-1 text-xs text-muted">{send.bounced} of {send.outbound} sent · keep under 5%</p>
+              <p className="mt-1 text-xs text-muted">{send.bounced7d} of {send.sent7d} sent in the last 7 days · keep under 5%</p>
             </div>
             <div className="flex items-baseline justify-between border-t border-border pt-3">
-              <span className="text-sm">Unsubscribes</span>
+              <span className="text-sm">Do Not Contact</span>
               <span className="text-xl font-semibold tabular-nums">{send.unsubscribed}</span>
             </div>
           </div>
@@ -147,18 +144,18 @@ export function OutreachView({ data }: { data: Data }) {
 
       <Card className="mt-4">
         <CardHeader
-          title="Today's queue"
-          description={`${queue.length} item${queue.length === 1 ? "" : "s"} · ${Math.min(queue.length, send.remainingToday)} fit within today's limit`}
+          title="Pipeline"
+          description={`${queue.length} item${queue.length === 1 ? "" : "s"} · ${send.remainingToday} send slot${send.remainingToday === 1 ? "" : "s"} left today`}
+          action={<Link href="/queue" className="text-xs text-muted hover:text-fg">Approval queue →</Link>}
         />
         {queue.length === 0 ? (
-          <p className="px-5 py-10 text-center text-sm text-muted">Queue is empty. Add leads or import a CSV to fill it.</p>
+          <p className="px-5 py-10 text-center text-sm text-muted">Nothing in the pipeline. The daily session adds leads and drafts.</p>
         ) : (
           <ul className="divide-y divide-border">
-            {queue.map((item, i) => {
-              const overflow = i >= send.remainingToday;
+            {queue.map((item) => {
               const Icon = item.draft ? Mail : item.type === "first" ? PenLine : Clock;
               return (
-                <li key={item.key} className={cn("flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:px-5", overflow && "opacity-60")}>
+                <li key={item.key} className="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:px-5">
                   <span className="hidden size-8 shrink-0 items-center justify-center rounded-full bg-panel-2 sm:flex">
                     <Icon className="size-4 text-muted" />
                   </span>
@@ -167,7 +164,6 @@ export function OutreachView({ data }: { data: Data }) {
                       <Link href={`/leads/${item.lead.id}`} className="font-medium hover:underline">{item.lead.businessName}</Link>
                       <WebsiteBadge status={item.lead.websiteStatus} />
                       <Score value={item.lead.score} />
-                      {overflow && <span className="text-xs text-amber-600 dark:text-amber-400">over today&apos;s limit</span>}
                     </div>
                     <p className="mt-0.5 truncate text-sm text-muted">
                       <span className="text-fg">{item.label}</span>
@@ -175,7 +171,7 @@ export function OutreachView({ data }: { data: Data }) {
                     </p>
                   </div>
                   <Button size="sm" variant={item.draft ? "primary" : "secondary"} onClick={() => open(item)} disabled={!item.lead.email} title={item.lead.email ? "" : "No email address on file"}>
-                    {item.draft ? "Review & send" : "Write email"}
+                    {item.draft ? "Review" : "Write email"}
                   </Button>
                 </li>
               );

@@ -201,10 +201,20 @@ export function WebsiteBadge({ status }: { status: string }) {
 }
 
 const EMAIL_STATUS_COLOR: Record<string, string> = {
-  draft: "gray", sent: "blue", opened: "violet", replied: "green", bounced: "red", unsubscribed: "red",
+  draft: "amber", approved: "blue", sending: "blue", sent: "blue", opened: "violet", replied: "green", received: "green",
+  bounced: "red", unsubscribed: "red", cancelled: "gray", failed: "red",
 };
+const STATUS_LABEL: Record<string, string> = { draft: "awaiting approval" };
 export function EmailStatusBadge({ status }: { status: string }) {
-  return <Badge color={EMAIL_STATUS_COLOR[status] ?? "gray"} className="capitalize">{status}</Badge>;
+  return <Badge color={EMAIL_STATUS_COLOR[status] ?? "gray"} className="capitalize">{STATUS_LABEL[status] ?? status}</Badge>;
+}
+
+const CATEGORY_COLOR: Record<string, string> = {
+  Unclassified: "gray", Interested: "green", Question: "violet", "Not now": "amber", "Not interested": "red",
+  Unsubscribe: "red", Bounce: "red", "Auto-reply": "gray",
+};
+export function CategoryBadge({ category }: { category: string }) {
+  return <Badge color={CATEGORY_COLOR[category] ?? "gray"}>{category || "Unclassified"}</Badge>;
 }
 
 export function Score({ value }: { value: number }) {

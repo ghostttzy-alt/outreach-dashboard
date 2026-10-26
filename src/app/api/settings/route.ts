@@ -1,17 +1,24 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { readJson, route } from "@/lib/api";
-import { getSettings } from "@/lib/services";
+import { getSettings, logActivity } from "@/lib/services";
 import { rampInfo } from "@/lib/utils";
-import { SETTINGS_FIELDS, pickFields } from "@/lib/validate";
+import { ApiError, SETTINGS_FIELDS, pickFields } from "@/lib/validate";
 
 export const GET = route(async () => {
   const settings = await getSettings();
-  return NextResponse.json({ data: { ...settings, ramp: rampInfo(settings.rampStartDate, settings.dailyLimit) } });
+  return NextResponse.json({ data: { ...settings, ramp: rampInfo(settings) } });
 });
 
 export const PATCH = route(async (req) => {
-  await getSettings();
-  const data = await prisma.settings.update({ where: { id: 1 }, data: pickFields(await readJson(req), SETTINGS_FIELDS) });
-  return NextResponse.json({ data });
+  const before = await getSettings();
+  const data = pickFields(await readJson(req), SETTINGS_FIELDS);
+  const start = (data.sendStartHour as number | undefined) ?? before.sendStartHour;
+  const end = (data.sendEndHour as number | undefined) ?? before.sendEndHour;
+  if (end <= start) throw new ApiError(400, "Sending hours: the end hour must be after the start hour");
+  if (data.paused === true && !before.paused) Object.assign(data, { pausedReason: "Paused manually", pausedAt: new Date() });
+  if (data.paused === false && before.paused) Object.assign(data, { pausedReason: "", pausedAt: null });
+  const settings = await prisma.settings.update({ where: { id: 1 }, data });
+  if (settings.paused !== before.paused) await logActivity(null, settings.paused ? "paused" : "resumed", settings.paused ? "Outreach paused" : "Outreach resumed");
+  return NextResponse.json({ data: settings });
 });

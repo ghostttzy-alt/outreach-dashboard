@@ -1,9 +1,12 @@
 import Link from "next/link";
-import { Clock, Inbox, Mail, MessageSquare, Palette, Send, Sparkles, Trophy, Users, DollarSign, ArrowRight } from "lucide-react";
-import { Card, CardHeader, StageBadge } from "@/components/ui";
+import { AlertTriangle, CheckSquare, Clock, Inbox, Mail, MessageSquare, Palette, PauseCircle, Send, Sparkles, Trophy, Users, DollarSign, ArrowRight, Hand } from "lucide-react";
+import { Badge, Card, CardHeader, StageBadge } from "@/components/ui";
+import { NeedsYouDismiss } from "@/components/overview/NeedsYouDismiss";
+import { prisma } from "@/lib/prisma";
+import { getState } from "@/lib/settings";
 import { ActivityChart } from "@/components/overview/ActivityChart";
 import { Funnel } from "@/components/overview/Funnel";
-import { getNeedsAttention, getOverview } from "@/lib/metrics";
+import { getNeedsAttention, getNeedsYou, getOverview } from "@/lib/metrics";
 import { cn, formatMoney, timeAgo } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -29,13 +32,27 @@ const ACTIVITY_ICON: Record<string, React.ElementType> = {
   client_won: Trophy,
   lead_created: Users,
   unsubscribe: Mail,
+  reply_classified: Inbox,
+  run: Sparkles,
+  auto_pause: PauseCircle,
   note: MessageSquare,
   import: Users,
 };
 
 export default async function OverviewPage() {
-  const [o, attention] = await Promise.all([getOverview(), getNeedsAttention()]);
+  const [o, attention, needsYou, toApprove, state] = await Promise.all([
+    getOverview(),
+    getNeedsAttention(),
+    getNeedsYou(),
+    prisma.email.count({ where: { direction: "outbound", status: "draft" } }),
+    getState(),
+  ]);
   const { send } = o;
+  const alerts: { title: string; detail: string; href: string }[] = [];
+  if (send.settings.paused) alerts.push({ title: "Outreach is paused", detail: send.settings.pausedReason || "Nothing will be sent until you resume.", href: "/settings" });
+  if (send.bounceRate > 5) alerts.push({ title: `Bounce rate is ${send.bounceRate}% (last 7 days)`, detail: `${send.bounced7d} of ${send.sent7d} emails bounced. Above 5% risks your Gmail reputation; sending pauses automatically.`, href: "/outreach" });
+  if (!send.gmailConnected) alerts.push({ title: send.gmailError ? "Gmail disconnected" : "Gmail not connected", detail: send.gmailError || "Connect Gmail in Settings so approved emails can be sent.", href: "/settings#gmail" });
+  if (state.replyCheckError && send.gmailConnected) alerts.push({ title: "Reply checking failed", detail: state.replyCheckError, href: "/settings#gmail" });
   const attentionCount = attention.awaitingReply.length + attention.followUpsDue.length + attention.interestedNoMockup.length;
 
   return (
@@ -46,6 +63,41 @@ export default async function OverviewPage() {
           {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })} · Ramp week {send.ramp.week}
         </p>
       </div>
+
+      {alerts.map((a) => (
+        <Link key={a.title} href={a.href} className="mb-3 flex items-start gap-3 rounded-xl border border-red-500/40 bg-red-500/10 p-4 text-sm transition-colors hover:bg-red-500/15">
+          {a.title.startsWith("Outreach is paused") ? <PauseCircle className="mt-0.5 size-4 shrink-0 text-red-500" /> : <AlertTriangle className="mt-0.5 size-4 shrink-0 text-red-500" />}
+          <div>
+            <p className="font-semibold text-red-600 dark:text-red-400">{a.title}</p>
+            <p className="text-muted">{a.detail}</p>
+          </div>
+        </Link>
+      ))}
+
+      {toApprove > 0 && (
+        <Link href="/queue" className="mb-4 flex items-center gap-3 rounded-xl border border-accent/40 bg-accent/10 p-4 text-sm transition-colors hover:bg-accent/15">
+          <CheckSquare className="size-5 shrink-0 text-accent" />
+          <p className="flex-1"><span className="font-semibold">Ready to approve: {toApprove} email{toApprove === 1 ? "" : "s"}</span><span className="text-muted"> · review and approve them in the Approval queue</span></p>
+          <ArrowRight className="size-4 text-muted" />
+        </Link>
+      )}
+
+      {needsYou.length > 0 && (
+        <Card className="mb-4 border-amber-500/40">
+          <CardHeader title={<span className="flex items-center gap-2"><Hand className="size-4 text-amber-500" /> Needs you</span>} description={`${needsYou.length} repl${needsYou.length === 1 ? "y" : "ies"} to look at`} />
+          <ul className="divide-y divide-border">
+            {needsYou.slice(0, 8).map((n) => (
+              <li key={n.id} className="flex items-center gap-3 px-4 py-2.5 sm:px-5">
+                <Link href={`/leads/${n.lead.id}`} className="min-w-0 flex-1">
+                  <span className="flex flex-wrap items-center gap-2 text-sm font-medium">{n.lead.businessName} <Badge color={n.category === "Question" ? "violet" : "amber"}>{n.category}</Badge></span>
+                  <span className="block truncate text-xs text-muted">{n.reason} · {n.subject || "(no subject)"} · {timeAgo(n.receivedAt)}</span>
+                </Link>
+                {n.flagged && <NeedsYouDismiss id={n.id} />}
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <Kpi label="Total leads" value={o.totalLeads} icon={Users} sub={`${o.byStage["Queued"] ?? 0} queued`} />
@@ -71,7 +123,7 @@ export default async function OverviewPage() {
           value={`${send.bounceRate}%`}
           icon={Mail}
           tone={send.bounceRate > 5 ? "warn" : undefined}
-          sub={`${send.bounced} bounced · ${send.unsubscribed} unsubscribed`}
+          sub={`Last 7 days · ${send.unsubscribed} Do Not Contact`}
         />
       </div>
 
@@ -93,8 +145,8 @@ export default async function OverviewPage() {
       <div className="mt-4 grid items-start gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader
-            title="Needs attention"
-            description={attentionCount ? `${attentionCount} items` : "You're all caught up"}
+            title="Work for the daily session"
+            description={attentionCount ? `${attentionCount} items it will pick up from /api/brief` : "Nothing waiting"}
             action={<Link href="/outreach" className="text-xs text-muted hover:text-fg">Outreach →</Link>}
           />
           <div className="grid divide-y divide-border md:grid-cols-3 md:divide-x md:divide-y-0">
@@ -102,7 +154,7 @@ export default async function OverviewPage() {
               title="Replies waiting"
               icon={Inbox}
               empty="No replies waiting"
-              items={attention.awaitingReply.map((a) => ({ id: a.lead.id, name: a.lead.businessName, meta: `Replied ${timeAgo(a.receivedAt)}` }))}
+              items={attention.awaitingReply.map((a) => ({ id: a.lead.id, name: a.lead.businessName, meta: `${a.category} · ${timeAgo(a.receivedAt)}` }))}
             />
             <AttentionList
               title="Follow-ups due"

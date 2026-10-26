@@ -14,7 +14,7 @@ export default async function LeadPage({ params }: { params: Promise<{ id: strin
         emails: { orderBy: [{ sentAt: "desc" }, { createdAt: "desc" }] },
         sites: { orderBy: { createdAt: "desc" } },
         client: true,
-        activities: { orderBy: { createdAt: "desc" }, take: 30 },
+        activities: { where: { type: { not: "bounce_notice" } }, orderBy: { createdAt: "desc" }, take: 30 },
       },
     }),
     prisma.template.findMany({ orderBy: { key: "asc" } }),

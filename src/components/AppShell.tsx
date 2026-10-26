@@ -3,18 +3,20 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Briefcase, Globe, LayoutDashboard, LogOut, MapPinned, Menu, Send, Settings, Users, X } from "lucide-react";
+import { Bot, Briefcase, CheckSquare, Globe, LayoutDashboard, LogOut, MapPinned, Menu, Send, Settings, Users, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { GlobalSearch } from "./GlobalSearch";
 import { ThemeToggle } from "./ThemeToggle";
 
 const NAV = [
   { href: "/", label: "Overview", icon: LayoutDashboard },
+  { href: "/queue", label: "Approval queue", icon: CheckSquare },
   { href: "/leads", label: "Leads", icon: Users },
   { href: "/outreach", label: "Outreach", icon: Send },
   { href: "/sites", label: "Sites & mockups", icon: Globe },
   { href: "/clients", label: "Clients", icon: Briefcase },
   { href: "/coverage", label: "Coverage", icon: MapPinned },
+  { href: "/runs", label: "Runs", icon: Bot },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
@@ -79,7 +81,7 @@ export function AppShell({ children, authEnabled }: { children: React.ReactNode;
         <div className="mt-6 flex-1">
           <NavLinks />
         </div>
-        {authEnabled ? <SignOut /> : <p className="px-2.5 text-[11px] text-muted">Local · SQLite</p>}
+        {authEnabled ? <SignOut /> : <p className="px-2.5 text-[11px] text-muted">Local · no sign-in</p>}
       </aside>
 
       {/* Mobile drawer */}

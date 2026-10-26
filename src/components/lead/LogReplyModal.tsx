@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { REPLY_CATEGORIES } from "@/lib/constants";
 import { Button, Field, Input, Modal, Select, Textarea, api } from "@/components/ui";
 import { useToast } from "@/components/toast";
 
-/** Log an email the lead sent you. Marking it "unsubscribed" moves the lead to Do Not Contact. */
+/** Log a reply that arrived outside Gmail checking (e.g. by phone or another inbox). Its category applies the reply rules. */
 export function LogReplyModal({ open, onClose, onSaved, leadId }: { open: boolean; onClose: () => void; onSaved: () => void; leadId: string }) {
   const toast = useToast();
   const now = new Date();
@@ -12,7 +13,7 @@ export function LogReplyModal({ open, onClose, onSaved, leadId }: { open: boolea
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
   const [sentAt, setSentAt] = useState(local);
-  const [status, setStatus] = useState("replied");
+  const [category, setCategory] = useState("Unclassified");
   const [busy, setBusy] = useState(false);
 
   const save = async (e: React.FormEvent) => {
@@ -21,9 +22,9 @@ export function LogReplyModal({ open, onClose, onSaved, leadId }: { open: boolea
     try {
       await api("/api/emails", {
         method: "POST",
-        body: { leadId, direction: "inbound", type: "reply", subject, body, status, sentAt: new Date(sentAt).toISOString() },
+        body: { leadId, direction: "inbound", type: "reply", subject, body, category, sentAt: new Date(sentAt).toISOString() },
       });
-      toast(status === "unsubscribed" ? "Logged unsubscribe. Lead is now Do Not Contact." : "Reply logged");
+      toast(["Unsubscribe", "Not interested"].includes(category) ? "Logged. Lead is now Do Not Contact." : "Reply logged");
       setSubject("");
       setBody("");
       onSaved();
@@ -42,10 +43,9 @@ export function LogReplyModal({ open, onClose, onSaved, leadId }: { open: boolea
           <Field label="Received">
             <Input type="datetime-local" value={sentAt} onChange={(e) => setSentAt(e.target.value)} />
           </Field>
-          <Field label="Kind">
-            <Select value={status} onChange={(e) => setStatus(e.target.value)}>
-              <option value="replied">Reply</option>
-              <option value="unsubscribed">Unsubscribe / asked not to be contacted</option>
+          <Field label="Category">
+            <Select value={category} onChange={(e) => setCategory(e.target.value)}>
+              {REPLY_CATEGORIES.map((c) => <option key={c}>{c}</option>)}
             </Select>
           </Field>
         </div>

@@ -1,5 +1,4 @@
-// SQLite has no native enums, so enum-like fields are stored as strings.
-// Allowed values live in src/lib/constants.ts and are validated by the API.
+// Enum-like fields are stored as strings. Allowed values live in src/lib/constants.ts and are validated by the API.
 
 generator client {
   provider = "prisma-client-js"
@@ -8,7 +7,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -18,7 +17,7 @@ model Lead {
   niche         String    @default("")
   city          String    @default("")
   contactName   String    @default("")
-  email         String    @default("")
+  email         String    @default("") // stored lowercased
   phone         String    @default("")
   website       String    @default("")
   websiteStatus String    @default("None") // None | Broken | Not Mobile | Outdated | No HTTPS | OK
@@ -28,16 +27,35 @@ model Lead {
   dateContacted DateTime?
   mockupUrl     String    @default("")
   notes         String    @default("")
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+
+  dedupeKey String @default("") // normalized "name|city", used for duplicate checks
+
+  // Audit: where the lead came from and who added it.
+  source    String @default("") // e.g. "Google Maps"
+  sourceUrl String @default("")
+  createdBy String @default("") // e.g. "daily-session" or "dashboard"
+  runId     String @default("") // the daily session run that found it, if any
+
+  // Follow-up sequence (see src/lib/followups.ts).
+  gmailThreadId    String    @default("")
+  nextFollowUpType String    @default("") // followup1 | followup2 | cold | ""
+  nextFollowUpAt   DateTime?
+  lastReplyAt      DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   emails     Email[]
   sites      Site[]
   client     Client?
   activities Activity[]
+  mockups    Mockup[]
 
   @@index([stage])
   @@index([city, niche])
+  @@index([email])
+  @@index([dedupeKey])
+  @@index([nextFollowUpAt])
 }
 
 model Email {
@@ -48,12 +66,36 @@ model Email {
   type      String    @default("first") // first | followup1 | followup2 | reply | mockup
   subject   String    @default("")
   body      String    @default("")
-  sentAt    DateTime?
-  status    String    @default("draft") // draft | sent | opened | replied | bounced | unsubscribed
+  sentAt    DateTime? // when it was sent (outbound) or received (inbound)
+  // draft (waiting for approval) | approved | sending | sent | opened | replied | bounced | unsubscribed | cancelled | failed
+  status    String    @default("draft")
   createdAt DateTime  @default(now())
+
+  // Approval queue and sending
+  approvedAt   DateTime?
+  sendingAt    DateTime? // when a send attempt started
+  attempts     Int       @default(0)
+  error        String    @default("")
+  createdBy    String    @default("") // "daily-session" | "dashboard"
+  fromAddress  String    @default("")
+  toAddress    String    @default("")
+
+  // Gmail identifiers, used to keep follow-ups in the same thread and to match replies.
+  gmailMessageId String? @unique
+  gmailThreadId  String  @default("")
+  rfcMessageId   String  @default("") // the Message-ID header
+
+  // Replies (inbound)
+  category     String    @default("") // Unclassified | Interested | Question | Not now | Not interested | Unsubscribe | Bounce | Auto-reply
+  classifiedAt DateTime?
+  classifiedBy String    @default("") // "keyword" | "auto" | "api" | "dashboard"
+  needsYou     Boolean   @default(false) // flagged for a human
+  needsYouNote String    @default("")
 
   @@index([leadId])
   @@index([sentAt])
+  @@index([status])
+  @@index([gmailThreadId])
 }
 
 model Site {
@@ -66,6 +108,18 @@ model Site {
   liveUrl      String   @default("")
   thumbnailUrl String   @default("")
   createdAt    DateTime @default(now())
+
+  @@index([leadId])
+}
+
+model Mockup {
+  id        String   @id @default(cuid())
+  leadId    String
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  slug      String   @unique
+  html      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([leadId])
 }
@@ -86,6 +140,8 @@ model Coverage {
   niche      String
   searchedAt DateTime @default(now())
   leadsFound Int      @default(0)
+
+  @@index([searchedAt])
 }
 
 model Activity {
@@ -97,6 +153,7 @@ model Activity {
   createdAt   DateTime @default(now())
 
   @@index([createdAt])
+  @@index([leadId])
 }
 
 model Template {
@@ -108,16 +165,73 @@ model Template {
   updatedAt DateTime @updatedAt
 }
 
+/// Addresses that must never be emailed. Checked when leads and drafts are created and again right before sending.
+model DoNotContact {
+  id        String   @id @default(cuid())
+  email     String   @unique // lowercased
+  reason    String   @default("")
+  createdAt DateTime @default(now())
+}
+
+/// One report per daily Claude Code session.
+model Run {
+  id        String   @id @default(cuid())
+  startedAt DateTime @default(now())
+  status    String   @default("ok") // ok | partial | failed
+  counts    Json     @default("{}")
+  notes     String   @default("")
+  errors    Json     @default("[]")
+  createdAt DateTime @default(now())
+
+  @@index([startedAt])
+}
+
 model Settings {
-  id             Int      @id @default(1)
-  yourName       String   @default("")
-  businessName   String   @default("")
-  mailingAddress String   @default("")
-  sendingEmail   String   @default("")
-  setupPrice     Float    @default(500)
-  monthlyFee     Float    @default(50)
-  dailyLimit     Int      @default(50) // hard cap; the ramp can only lower it
-  rampStartDate  DateTime @default(now())
-  followup1Days  Int      @default(3)
-  followup2Days  Int      @default(5)
+  id             Int    @id @default(1)
+  yourName       String @default("")
+  businessName   String @default("")
+  mailingAddress String @default("")
+  sendingEmail   String @default("")
+  setupPrice     Float  @default(500)
+  monthlyFee     Float  @default(50)
+
+  dailyLimit    Int      @default(50) // hard cap; the ramp can only lower it
+  rampSchedule  Int[]    @default([20, 30, 40, 50]) // emails per day for week 1, 2, 3, 4+
+  rampStartDate DateTime @default(now())
+  timezone      String   @default("America/New_York")
+  sendStartHour Int      @default(8) // local time, inclusive
+  sendEndHour   Int      @default(17) // local time, exclusive
+  sendWeekends  Boolean  @default(false)
+
+  targetCities   String[] @default([])
+  targetNiches   String[] @default([])
+  chainBlocklist String[] @default([])
+
+  followup1Days Int @default(4) // days after the first email
+  followup2Days Int @default(5) // days after follow-up 1
+  coldAfterDays Int @default(5) // days after follow-up 2 with no reply before the lead is marked Cold
+
+  paused       Boolean   @default(false)
+  pausedReason String    @default("")
+  pausedAt     DateTime?
+}
+
+/// Internal state that is never shown or edited directly.
+model SystemState {
+  id Int @id @default(1)
+
+  passwordHash   String    @default("")
+  failedLogins   Int       @default(0)
+  lockedUntil    DateTime?
+
+  gmailEmail       String    @default("")
+  gmailTokens      String    @default("") // AES-256-GCM encrypted JSON
+  gmailConnectedAt DateTime?
+  gmailError       String    @default("") // set when Google rejects the saved tokens
+
+  nextSendAt       DateTime?
+  sendLockUntil    DateTime?
+  lastSendTickAt   DateTime?
+  lastReplyCheckAt DateTime?
+  replyCheckError  String    @default("")
 }

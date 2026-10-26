@@ -6,10 +6,10 @@ import { useState } from "react";
 import {
   ArrowLeft, Ban, ChevronDown, ExternalLink, Eye, Inbox, Mail, Plus, Send, Sparkles, Trash2, Trophy,
 } from "lucide-react";
-import { EMAIL_STATUSES, EMAIL_TYPE_LABELS, STAGES, WEBSITE_STATUSES } from "@/lib/constants";
+import { EMAIL_TYPE_LABELS, REPLY_CATEGORIES, SENT_STATUSES, STAGES, WEBSITE_STATUSES } from "@/lib/constants";
 import type { EmailDTO, LeadFull, SettingsDTO, TemplateDTO } from "@/lib/types";
 import { cn, ensureUrl, formatDate, formatDateTime, formatMoney, timeAgo } from "@/lib/utils";
-import { Badge, Button, Card, CardHeader, EmailStatusBadge, Modal, Score, Select, StageBadge, Textarea, WebsiteBadge, api } from "@/components/ui";
+import { Badge, Button, CardHeader, Card, CategoryBadge, EmailStatusBadge, Modal, Score, Select, StageBadge, Textarea, WebsiteBadge, api } from "@/components/ui";
 import { useConfirm } from "@/components/confirm";
 import { useToast } from "@/components/toast";
 import { EmailComposer } from "@/components/EmailComposer";
@@ -76,6 +76,16 @@ export function LeadDetail({ lead, templates, settings }: Props) {
     refresh();
   };
 
+  const classify = async (e: EmailDTO, category: string) => {
+    try {
+      await api(`/api/replies/${e.id}/classify`, { method: "POST", body: { category } });
+      toast(`Classified as ${category}`);
+      refresh();
+    } catch (err) {
+      toast((err as Error).message, "error");
+    }
+  };
+
   const setEmailStatus = async (e: EmailDTO, status: string) => {
     try {
       await api(`/api/emails/${e.id}`, { method: "PATCH", body: { status } });
@@ -112,7 +122,14 @@ export function LeadDetail({ lead, templates, settings }: Props) {
           </div>
           <p className="mt-1 text-sm text-muted">
             {[lead.niche, lead.city].filter(Boolean).join(" · ")} · Added {formatDate(lead.createdAt)}
+            {lead.createdBy && ` by ${lead.createdBy}`}
+            {lead.source && <> · Source: {lead.sourceUrl ? <a href={ensureUrl(lead.sourceUrl)} target="_blank" rel="noreferrer" className="underline hover:text-fg">{lead.source}</a> : lead.source}</>}
           </p>
+          {lead.nextFollowUpAt && lead.nextFollowUpType && (
+            <p className="mt-1 text-xs text-muted">
+              Next: {lead.nextFollowUpType === "cold" ? "marked Cold if no reply" : EMAIL_TYPE_LABELS[lead.nextFollowUpType]} on {formatDate(lead.nextFollowUpAt)}
+            </p>
+          )}
         </div>
         <div className="flex flex-wrap gap-2">
           <Button onClick={() => setStage("Interested")} disabled={lead.stage === "Interested"}>
@@ -219,7 +236,7 @@ export function LeadDetail({ lead, templates, settings }: Props) {
                 <div className="flex gap-2">
                   <Button size="sm" onClick={() => setLogReply(true)}><Inbox className="size-3.5" /> Log reply</Button>
                   <Button size="sm" variant="primary" disabled={dnc} onClick={() => setComposer({ open: true, type: nextType })}>
-                    <Plus className="size-3.5" /> New email
+                    <Plus className="size-3.5" /> Write email
                   </Button>
                 </div>
               }
@@ -240,29 +257,36 @@ export function LeadDetail({ lead, templates, settings }: Props) {
                           inbound ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400" : "bg-panel-2 text-muted",
                         )}
                       >
-                        {inbound ? <Inbox className="size-3.5" /> : e.status === "draft" ? <Mail className="size-3.5" /> : <Send className="size-3.5" />}
+                        {inbound ? <Inbox className="size-3.5" /> : !e.sentAt ? <Mail className="size-3.5" /> : <Send className="size-3.5" />}
                       </span>
                       <div className="min-w-0 flex-1 rounded-lg border border-border bg-panel-2/40 p-3">
                         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                           <span className="text-xs font-medium">{inbound ? "Received" : EMAIL_TYPE_LABELS[e.type] ?? e.type}</span>
-                          <EmailStatusBadge status={e.status} />
-                          <span className="ml-auto text-xs text-muted">{e.sentAt ? formatDateTime(e.sentAt) : "Not sent"}</span>
+                          {inbound ? <CategoryBadge category={e.category} /> : <EmailStatusBadge status={e.status} />}
+                          {e.needsYou && <Badge color="amber">Needs you</Badge>}
+                          <span className="ml-auto text-xs text-muted">{e.sentAt ? formatDateTime(e.sentAt) : `Not sent · ${timeAgo(e.createdAt)}`}</span>
                         </div>
                         <button className="mt-1.5 flex w-full items-start gap-1 text-left text-sm font-medium" onClick={() => setExpanded(open ? null : e.id)}>
                           <span className="min-w-0 flex-1">{e.subject || "(no subject)"}</span>
                           <ChevronDown className={cn("mt-0.5 size-4 shrink-0 text-muted transition-transform", open && "rotate-180")} />
                         </button>
+                        {e.error && <p className="mt-1 text-xs text-red-500">{e.error}</p>}
                         {open && (
                           <>
+                            {e.needsYouNote && <p className="mt-2 text-xs text-amber-600 dark:text-amber-400">{e.needsYouNote}</p>}
                             <pre className="mt-2 whitespace-pre-wrap break-words font-sans text-sm text-muted">{e.body || "(empty)"}</pre>
                             <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-border pt-3">
-                              {e.status === "draft" ? (
-                                <Button size="sm" variant="primary" onClick={() => setComposer({ open: true, draft: e })}>Edit & send</Button>
-                              ) : (
-                                <Select className="h-8 w-auto text-xs" value={e.status} onChange={(ev) => setEmailStatus(e, ev.target.value)} aria-label="Email status">
-                                  {EMAIL_STATUSES.filter((s) => s !== "draft").map((s) => <option key={s} value={s}>{s}</option>)}
+                              {inbound ? (
+                                <Select className="h-8 w-auto text-xs" value={e.category || "Unclassified"} onChange={(ev) => classify(e, ev.target.value)} aria-label="Reply category">
+                                  {REPLY_CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
                                 </Select>
-                              )}
+                              ) : ["draft", "approved", "failed"].includes(e.status) ? (
+                                <Link href="/queue"><Button size="sm" variant="primary">Open approval queue</Button></Link>
+                              ) : SENT_STATUSES.includes(e.status) ? (
+                                <Select className="h-8 w-auto text-xs" value={e.status} onChange={(ev) => setEmailStatus(e, ev.target.value)} aria-label="Email status">
+                                  {SENT_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+                                </Select>
+                              ) : null}
                               <Button size="sm" variant="ghost" className="ml-auto text-red-500 hover:text-red-500" onClick={() => deleteEmail(e)}>
                                 <Trash2 className="size-3.5" /> Delete
                               </Button>

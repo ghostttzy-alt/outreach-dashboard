@@ -1,12 +1,17 @@
 import { PrismaClient } from "@prisma/client";
-import { PrismaLibSQL } from "@prisma/adapter-libsql";
 
 /**
- * Local development uses the SQLite file in DATABASE_URL.
- * When TURSO_DATABASE_URL is set (e.g. on Netlify), the same schema runs on Turso's hosted libSQL.
+ * Neon's and Supabase's pooled connection strings go through PgBouncer, which needs `pgbouncer=true`
+ * so Prisma doesn't use prepared statements. Add it automatically so either kind of URL works.
  */
+export function runtimeDatabaseUrl(url = process.env.DATABASE_URL ?? "") {
+  if (!url) return url;
+  const pooled = /-pooler\.|pooler\.supabase\.com|:6543\//.test(url);
+  if (!pooled || /[?&]pgbouncer=/.test(url)) return url;
+  return url + (url.includes("?") ? "&" : "?") + "pgbouncer=true";
+}
+
 export function createPrisma() {
-  const url = process.env.TURSO_DATABASE_URL;
-  if (!url) return new PrismaClient();
-  return new PrismaClient({ adapter: new PrismaLibSQL({ url, authToken: process.env.TURSO_AUTH_TOKEN }) });
+  const url = runtimeDatabaseUrl();
+  return url ? new PrismaClient({ datasourceUrl: url }) : new PrismaClient();
 }

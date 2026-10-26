@@ -1,74 +1,49 @@
 import { prisma } from "./prisma";
-import { CLOSED_STAGES, FUNNEL_STAGES, STAGE_RANK } from "./constants";
-import { getSettings } from "./services";
-import { addDays, daysBetween, pct, rampInfo, startOfToday } from "./utils";
+import { FUNNEL_STAGES, SENT_STATUSES, STAGE_RANK } from "./constants";
+import { getFollowUpsDue } from "./followups";
+import { bounceStats } from "./replies";
+import { sendStatus } from "./sender";
+import { getInterestedNeedingMockups, getUnansweredReplies } from "./brief";
+import { addDays, pct, startOfToday } from "./utils";
 
-const SENT_STATUSES = ["sent", "opened", "replied", "bounced"];
+export { getFollowUpsDue };
 
 export async function getSendStats() {
-  const settings = await getSettings();
-  const today = startOfToday();
-  const [sentToday, outbound, bounced, unsubscribed] = await Promise.all([
-    prisma.email.count({ where: { direction: "outbound", status: { in: SENT_STATUSES }, sentAt: { gte: today } } }),
+  const [s, bounce, outbound, bounced, unsubscribed] = await Promise.all([
+    sendStatus(),
+    bounceStats(),
     prisma.email.count({ where: { direction: "outbound", status: { in: SENT_STATUSES } } }),
     prisma.email.count({ where: { direction: "outbound", status: "bounced" } }),
-    prisma.email.count({ where: { status: "unsubscribed" } }),
+    prisma.lead.count({ where: { stage: "Do Not Contact" } }),
   ]);
-  const ramp = rampInfo(settings.rampStartDate, settings.dailyLimit);
   return {
-    settings,
-    ramp,
-    sentToday,
-    remainingToday: Math.max(0, ramp.limit - sentToday),
-    overLimit: sentToday > ramp.limit,
+    settings: s.settings,
+    ramp: s.ramp,
+    sentToday: s.sentToday,
+    remainingToday: s.remainingToday,
+    overLimit: s.sentToday > s.ramp.limit,
+    gmailConnected: s.gmailConnected,
+    gmailEmail: s.state.gmailEmail,
+    gmailError: s.state.gmailError,
+    nextSendAt: s.state.nextSendAt,
+    blockers: s.blockers,
     outbound,
     bounced,
-    bounceRate: pct(bounced, outbound),
+    /** Bounce rate over the last 7 days; this is what auto-pauses sending above 5%. */
+    bounceRate: bounce.bounceRate7d,
+    sent7d: bounce.sent7d,
+    bounced7d: bounce.bounced7d,
     unsubscribed,
   };
 }
 
-/**
- * Follow-ups due: leads in Contacted / Follow-up 1 whose last outbound email is older than the
- * follow-up interval and who haven't replied since.
- */
-export async function getFollowUpsDue() {
-  const settings = await getSettings();
-  const leads = await prisma.lead.findMany({
-    where: { stage: { in: ["Contacted", "Follow-up 1"] } },
-    include: { emails: { where: { sentAt: { not: null } }, orderBy: { sentAt: "desc" }, take: 1 } },
-  });
-  const now = new Date();
-  return leads
-    .map((lead) => {
-      const last = lead.emails[0];
-      if (!last || last.direction === "inbound" || !last.sentAt) return null;
-      const next = lead.stage === "Contacted" ? "followup1" : "followup2";
-      const wait = next === "followup1" ? settings.followup1Days : settings.followup2Days;
-      const dueDate = addDays(startOfToday(last.sentAt), wait);
-      const overdueDays = daysBetween(dueDate, now);
-      if (overdueDays < 0) return null;
-      const { emails: _e, ...rest } = lead;
-      return { lead: rest, next: next as "followup1" | "followup2", lastSentAt: last.sentAt, dueDate, overdueDays };
-    })
-    .filter((x) => x !== null)
-    .sort((a, b) => b.overdueDays - a.overdueDays);
-}
-
 export async function getNeedsAttention() {
-  const leads = await prisma.lead.findMany({
-    where: { stage: { notIn: CLOSED_STAGES } },
-    include: {
-      emails: { where: { sentAt: { not: null } }, orderBy: { sentAt: "desc" }, take: 1 },
-      sites: { select: { id: true } },
-    },
-  });
-  const awaitingReply = leads
-    .filter((l) => l.emails[0]?.direction === "inbound")
-    .map((l) => ({ lead: l, receivedAt: l.emails[0].sentAt!, subject: l.emails[0].subject }))
-    .sort((a, b) => a.receivedAt.getTime() - b.receivedAt.getTime());
-  const interestedNoMockup = leads.filter((l) => l.stage === "Interested" && !l.mockupUrl && l.sites.length === 0);
-  const followUpsDue = await getFollowUpsDue();
+  const [unanswered, followUpsDue, interestedNoMockup] = await Promise.all([
+    getUnansweredReplies(),
+    getFollowUpsDue(),
+    getInterestedNeedingMockups(),
+  ]);
+  const awaitingReply = unanswered.map((r) => ({ lead: r.lead, receivedAt: r.sentAt!, subject: r.subject, category: r.category }));
   return { awaitingReply, interestedNoMockup, followUpsDue };
 }
 
@@ -80,14 +55,15 @@ export async function getOverview() {
       prisma.lead.count(),
       prisma.lead.groupBy({ by: ["stage"], _count: true }),
       prisma.email.findMany({
-        where: { sentAt: { gte: since }, status: { not: "draft" } },
+        where: { sentAt: { gte: since }, status: { notIn: ["draft", "approved", "sending", "cancelled", "failed"] } },
         select: { sentAt: true, direction: true },
       }),
       prisma.client.findMany(),
       prisma.lead.count({ where: { OR: [{ stage: "Mockup Sent" }, { emails: { some: { type: "mockup", direction: "outbound", status: { not: "draft" } } } }] } }),
       prisma.lead.count({ where: { emails: { some: { direction: "outbound", status: { in: SENT_STATUSES } } } } }),
-      prisma.lead.count({ where: { emails: { some: { direction: "inbound" } } } }),
+      prisma.lead.count({ where: { emails: { some: { direction: "inbound", category: { notIn: ["Bounce", "Auto-reply"] } } } } }),
       prisma.activity.findMany({
+        where: { type: { not: "bounce_notice" } },
         orderBy: { createdAt: "desc" },
         take: 8,
         include: { lead: { select: { id: true, businessName: true } } },
@@ -139,4 +115,27 @@ export async function getOverview() {
     funnel,
     activity,
   };
+}
+
+/**
+ * Replies that need a human: anything the daily session flagged, questions still waiting for an answer,
+ * and replies nobody has classified for over a day.
+ */
+export async function getNeedsYou() {
+  const unanswered = await getUnansweredReplies();
+  const dayAgo = addDays(new Date(), -1);
+  const flagged = await prisma.email.findMany({
+    where: { direction: "inbound", needsYou: true },
+    include: { lead: true },
+    orderBy: { sentAt: "desc" },
+    take: 50,
+  });
+  const items = new Map<string, { id: string; lead: { id: string; businessName: string }; reason: string; category: string; receivedAt: Date; subject: string; flagged: boolean }>();
+  for (const r of flagged) items.set(r.id, { id: r.id, lead: r.lead, reason: r.needsYouNote || "Flagged by the daily session", category: r.category, receivedAt: r.sentAt!, subject: r.subject, flagged: true });
+  for (const r of unanswered) {
+    if (items.has(r.id)) continue;
+    if (r.category === "Question") items.set(r.id, { id: r.id, lead: r.lead, reason: "Asked a question", category: r.category, receivedAt: r.sentAt!, subject: r.subject, flagged: false });
+    else if (r.category === "Unclassified" && r.sentAt! < dayAgo) items.set(r.id, { id: r.id, lead: r.lead, reason: "Not classified for over a day", category: r.category, receivedAt: r.sentAt!, subject: r.subject, flagged: false });
+  }
+  return [...items.values()].sort((a, b) => b.receivedAt.getTime() - a.receivedAt.getTime());
 }

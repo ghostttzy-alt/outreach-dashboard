@@ -240,7 +240,17 @@ function render(text: string, lead: LeadSeed) {
     .replace(/\{mailing_address\}/g, "123 Main St, Austin, TX 78701");
 }
 
+/** Sample data is for local development only; never load it into the hosted database. */
+function isLocalDatabase() {
+  const url = process.env.DATABASE_URL ?? "";
+  return /@(localhost|127\.0\.0\.1)(:\d+)?\//.test(url) || /^postgres(ql)?:\/\/[^@]*\/\//.test(url) || url.includes("host=/");
+}
+
 async function main() {
+  if ((process.env.NODE_ENV === "production" || !isLocalDatabase()) && !process.argv.includes("--allow-remote")) {
+    console.log("Refusing to load sample data: DATABASE_URL is not a local database. Sample data is for local development only.");
+    return;
+  }
   const existing = await prisma.lead.count();
   if (existing > 0 && !force) {
     console.log(`Database already has ${existing} leads. Run "npm run db:clear" first, or "npm run db:seed -- --force" to add samples anyway.`);

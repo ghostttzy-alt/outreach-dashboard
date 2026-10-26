@@ -4,7 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { route } from "@/lib/api";
 import { LEAD_CSV_FIELDS, guessMapping, parseCsv } from "@/lib/csv";
 import { STAGES, WEBSITE_STATUSES } from "@/lib/constants";
-import { logActivity } from "@/lib/services";
+import { dedupeKey } from "@/lib/leads";
+import { logActivity, normalizeEmail } from "@/lib/services";
 import { ApiError } from "@/lib/validate";
 
 /**
@@ -13,7 +14,7 @@ import { ApiError } from "@/lib/validate";
  *  - application/json:   { "csv": "<csv text>", "mapping"?: {...} }  or  { "rows": [{ businessName, ... }] }
  *  - text/csv:           raw CSV body
  * Add ?dryRun=1 to get headers, guessed mapping and a preview without saving.
- * Rows whose email already exists are skipped as duplicates.
+ * Rows whose email or name+city already exists are skipped as duplicates; Do Not Contact addresses are rejected.
  */
 export const POST = route(async (req) => {
   const url = new URL(req.url);
@@ -49,9 +50,10 @@ export const POST = route(async (req) => {
   if (dryRun) return NextResponse.json({ headers, mapping, preview: rows.slice(0, 5), total: rows.length });
   if (!mapping.businessName) throw new ApiError(400, "Map a column to businessName");
 
-  const existing = new Set(
-    (await prisma.lead.findMany({ select: { email: true }, where: { email: { not: "" } } })).map((l) => l.email.toLowerCase()),
-  );
+  const leads = await prisma.lead.findMany({ select: { email: true, dedupeKey: true } });
+  const existing = new Set(leads.map((l) => l.email).filter(Boolean));
+  const existingKeys = new Set(leads.map((l) => l.dedupeKey).filter(Boolean));
+  const dnc = new Set((await prisma.doNotContact.findMany({ select: { email: true } })).map((d) => d.email));
 
   const toCreate: Prisma.LeadCreateManyInput[] = [];
   const errors: { row: number; error: string }[] = [];
@@ -61,9 +63,12 @@ export const POST = route(async (req) => {
     const get = (field: string) => (mapping![field] ? String(row[mapping![field]] ?? "").trim() : "");
     const businessName = get("businessName");
     if (!businessName) return errors.push({ row: i + 2, error: "Missing business name" });
-    const email = get("email");
-    if (email && existing.has(email.toLowerCase())) return duplicates++;
-    if (email) existing.add(email.toLowerCase());
+    const email = normalizeEmail(get("email"));
+    const key = dedupeKey(businessName, get("city"));
+    if (email && dnc.has(email)) return errors.push({ row: i + 2, error: `${email} is on the Do Not Contact list` });
+    if ((email && existing.has(email)) || existingKeys.has(key)) return duplicates++;
+    if (email) existing.add(email);
+    existingKeys.add(key);
 
     const ws = WEBSITE_STATUSES.find((s) => s.toLowerCase() === get("websiteStatus").toLowerCase());
     const stage = STAGES.find((s) => s.toLowerCase() === get("stage").toLowerCase());
@@ -72,7 +77,7 @@ export const POST = route(async (req) => {
     const website = get("website");
 
     toCreate.push({
-      businessName, email, website, score,
+      businessName, email, website, score, dedupeKey: key, createdBy: "csv-import",
       niche: get("niche"), city: get("city"), contactName: get("contactName"), phone: get("phone"),
       mainProblem: get("mainProblem"), mockupUrl: get("mockupUrl"), notes: get("notes"),
       websiteStatus: ws ?? (website ? "OK" : "None"),

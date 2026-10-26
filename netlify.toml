@@ -1,12 +1,15 @@
 # Netlify detects Next.js and uses its Next.js runtime automatically.
-# Set these environment variables in Netlify (Site configuration → Environment variables):
-#   TURSO_DATABASE_URL, TURSO_AUTH_TOKEN  hosted database (required; SQLite files don't persist on Netlify)
-#   DASHBOARD_PASSWORD                    password for the sign-in page (required on a public URL)
-#   API_TOKEN                             optional, lets scripts call the API with "Authorization: Bearer <token>"
+# Environment variables (Site configuration → Environment variables), see README "Going live":
+#   DATABASE_URL                 Postgres connection string (Neon or Supabase)  required
+#   DASHBOARD_PASSWORD           your sign-in password                           required
+#   API_KEY                      key the daily Claude session sends as "x-api-key" required
+#   GOOGLE_CLIENT_ID / _SECRET   Gmail sending and reply checking                 required for sending
 [build]
-  # turso:setup creates the tables on the first deploy and does nothing after that.
-  command = "npm run turso:setup && npm run build"
+  # db:deploy applies database migrations (creates the tables on the first deploy).
+  command = "npm run db:deploy && npm run build"
   publish = ".next"
 
 [build.environment]
   NODE_VERSION = "20"
+
+# Scheduled functions (send-tick every 2 minutes, check-replies every 30 minutes) live in netlify/functions.

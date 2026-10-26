@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Copy, Mail } from "lucide-react";
+import { Copy } from "lucide-react";
 import { EMAIL_TYPES, EMAIL_TYPE_LABELS } from "@/lib/constants";
 import { renderTemplate } from "@/lib/templates";
 import type { EmailDTO, LeadDTO, SettingsDTO, TemplateDTO } from "@/lib/types";
@@ -22,8 +22,8 @@ type Props = {
 };
 
 /**
- * Compose an outbound email from a template. The app doesn't send mail itself: copy the text or
- * open it in your mail app, then "Mark as sent" to log it (which advances the lead's stage).
+ * Compose an outbound email from a template. It goes into the Approval Queue (or straight to approved),
+ * and the scheduler sends it through Gmail within the daily limit.
  */
 export function EmailComposer({ open, onClose, onSaved, lead, templates, settings, initialType, draft }: Props) {
   const toast = useToast();
@@ -58,13 +58,13 @@ export function EmailComposer({ open, onClose, onSaved, lead, templates, setting
 
   const dnc = lead.stage === "Do Not Contact";
 
-  const save = async (status: "draft" | "sent") => {
+  const save = async (status: "draft" | "approved") => {
     setBusy(true);
     setError("");
     try {
       if (draft) await api(`/api/emails/${draft.id}`, { method: "PATCH", body: { type, subject, body, status } });
       else await api("/api/emails", { method: "POST", body: { leadId: lead.id, direction: "outbound", type, subject, body, status } });
-      toast(status === "draft" ? "Draft saved" : `Logged ${EMAIL_TYPE_LABELS[type]} to ${lead.businessName}`);
+      toast(status === "draft" ? "Added to the approval queue" : `${EMAIL_TYPE_LABELS[type]} to ${lead.businessName} approved; it will send shortly`);
       onSaved();
       onClose();
     } catch (err) {
@@ -73,8 +73,6 @@ export function EmailComposer({ open, onClose, onSaved, lead, templates, setting
       setBusy(false);
     }
   };
-
-  const mailto = `mailto:${encodeURIComponent(lead.email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
   return (
     <Modal open={open} onClose={onClose} title={`Email ${lead.businessName}`} size="lg">
@@ -126,11 +124,8 @@ export function EmailComposer({ open, onClose, onSaved, lead, templates, setting
           >
             <Copy className="size-4" /> Copy
           </Button>
-          <a href={mailto}>
-            <Button type="button" variant="ghost"><Mail className="size-4" /> Open in mail app</Button>
-          </a>
-          <Button type="button" disabled={busy} onClick={() => save("draft")}>Save draft</Button>
-          <Button type="button" variant="primary" disabled={busy} onClick={() => save("sent")}>Mark as sent</Button>
+          <Button type="button" disabled={busy || !lead.email} onClick={() => save("draft")}>Add to approval queue</Button>
+          <Button type="button" variant="primary" disabled={busy || !lead.email} onClick={() => save("approved")}>Approve & send</Button>
         </div>
       )}
     </Modal>

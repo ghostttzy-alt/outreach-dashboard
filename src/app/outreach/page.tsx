@@ -9,12 +9,12 @@ export default async function OutreachPage() {
     getSendStats(),
     getFollowUpsDue(),
     prisma.email.findMany({
-      where: { direction: "outbound", status: "draft" },
+      where: { direction: "outbound", status: { in: ["draft", "approved"] } },
       include: { lead: true },
       orderBy: { createdAt: "asc" },
     }),
     prisma.lead.findMany({
-      where: { stage: "Queued", emails: { none: { direction: "outbound" } } },
+      where: { stage: "Queued", email: { not: "" }, emails: { none: { direction: "outbound", status: { notIn: ["cancelled", "failed"] } } } },
       orderBy: [{ score: "desc" }, { createdAt: "asc" }],
     }),
     prisma.template.findMany({ orderBy: { key: "asc" } }),

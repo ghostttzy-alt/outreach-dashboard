@@ -1,24 +1,29 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { AUTH_COOKIE, authEnabled, safeEqual, sessionToken } from "@/lib/auth";
+import { AUTH_COOKIE, apiKeyValid, authRequired, cronSecret, safeEqual, verifySessionToken } from "@/lib/auth";
 
 export async function middleware(req: NextRequest) {
-  if (!authEnabled()) return NextResponse.next();
+  const path = req.nextUrl.pathname;
+  const isApi = path.startsWith("/api/");
 
-  const cookie = req.cookies.get(AUTH_COOKIE)?.value;
-  if (cookie && safeEqual(cookie, await sessionToken())) return NextResponse.next();
-
-  const apiToken = process.env.API_TOKEN;
-  const bearer = req.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
-  if (apiToken && bearer && safeEqual(bearer, apiToken)) return NextResponse.next();
-
-  if (req.nextUrl.pathname.startsWith("/api/")) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (isApi) {
+    const key = req.headers.get("x-api-key") ?? req.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
+    if (apiKeyValid(key)) return NextResponse.next();
+    if (path.startsWith("/api/cron/")) {
+      const secret = req.headers.get("x-cron-secret");
+      if (secret && safeEqual(secret, await cronSecret())) return NextResponse.next();
+    }
   }
+
+  if (!authRequired()) return NextResponse.next();
+  if (await verifySessionToken(req.cookies.get(AUTH_COOKIE)?.value)) return NextResponse.next();
+
+  if (isApi) return NextResponse.json({ error: "Unauthorized. Send your API key in the x-api-key header." }, { status: 401 });
   const login = new URL("/login", req.url);
-  if (req.nextUrl.pathname !== "/") login.searchParams.set("next", req.nextUrl.pathname + req.nextUrl.search);
+  if (path !== "/") login.searchParams.set("next", path + req.nextUrl.search);
   return NextResponse.redirect(login);
 }
 
 export const config = {
-  matcher: ["/((?!login|api/auth|_next/static|_next/image|favicon.ico).*)"],
+  // Public: the sign-in page and its API, mockup previews, and static files.
+  matcher: ["/((?!login|api/auth/login|preview/|_next/static|_next/image|favicon.ico|robots.txt).*)"],
 };

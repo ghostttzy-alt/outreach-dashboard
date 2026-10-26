@@ -12,7 +12,7 @@ export const GET = route(async (_req, { params }: IdCtx) => {
       emails: { orderBy: [{ sentAt: "desc" }, { createdAt: "desc" }] },
       sites: { orderBy: { createdAt: "desc" } },
       client: true,
-      activities: { orderBy: { createdAt: "desc" }, take: 50 },
+      activities: { where: { type: { not: "bounce_notice" } }, orderBy: { createdAt: "desc" }, take: 50 },
     },
   });
   if (!lead) return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -21,7 +21,10 @@ export const GET = route(async (_req, { params }: IdCtx) => {
 
 export const PATCH = route(async (req, { params }: IdCtx) => {
   const { id } = await params;
-  const lead = await updateLead(id, pickFields(await readJson(req), LEAD_FIELDS));
+  const body = await readJson(req);
+  // "problem" is accepted as a short name for mainProblem.
+  if (body && typeof body === "object" && "problem" in body && !("mainProblem" in body)) body.mainProblem = body.problem;
+  const lead = await updateLead(id, pickFields(body, LEAD_FIELDS));
   return NextResponse.json({ data: lead });
 });
 

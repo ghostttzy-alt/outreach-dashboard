@@ -29,3 +29,16 @@ export async function readJson(req: Request) {
 }
 
 export type IdCtx = { params: Promise<{ id: string }> };
+
+/** Who is calling: the daily Claude session (API key) or the signed-in dashboard. */
+export function actor(req: Request) {
+  return req.headers.get("x-api-key") || /^Bearer\s/i.test(req.headers.get("authorization") ?? "") ? "daily-session" : "dashboard";
+}
+
+/** Accept a single object, an array, or { items: [...] } / { leads: [...] } / { drafts: [...] }. */
+export function asList(body: unknown, key: string): { list: unknown[]; single: boolean } {
+  if (Array.isArray(body)) return { list: body, single: false };
+  if (body && typeof body === "object" && Array.isArray((body as Record<string, unknown>)[key])) return { list: (body as Record<string, unknown[]>)[key], single: false };
+  if (body && typeof body === "object" && Array.isArray((body as Record<string, unknown>).items)) return { list: (body as Record<string, unknown[]>).items, single: false };
+  return { list: [body], single: true };
+}
