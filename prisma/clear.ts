@@ -1,8 +1,8 @@
-import { PrismaClient } from "@prisma/client";
+import { createPrisma } from "./client";
 
 // Removes every lead and everything attached to it (emails, sites, clients, activity),
 // plus coverage history. Settings and email templates are kept.
-const prisma = new PrismaClient();
+const prisma = createPrisma();
 
 async function main() {
   if (!process.argv.includes("--yes")) {

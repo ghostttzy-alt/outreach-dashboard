@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Briefcase, Globe, LayoutDashboard, MapPinned, Menu, Send, Settings, Users, X } from "lucide-react";
+import { Briefcase, Globe, LayoutDashboard, LogOut, MapPinned, Menu, Send, Settings, Users, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { GlobalSearch } from "./GlobalSearch";
 import { ThemeToggle } from "./ThemeToggle";
@@ -52,10 +52,24 @@ function Brand() {
   );
 }
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+function SignOut() {
+  const signOut = async () => {
+    await fetch("/api/auth/logout", { method: "POST" });
+    window.location.href = "/login";
+  };
+  return (
+    <button onClick={signOut} className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-muted transition-colors hover:bg-panel-2/60 hover:text-fg">
+      <LogOut className="size-4" /> Sign out
+    </button>
+  );
+}
+
+export function AppShell({ children, authEnabled }: { children: React.ReactNode; authEnabled: boolean }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   useEffect(() => setOpen(false), [pathname]);
+
+  if (pathname === "/login") return <main className="mx-auto w-full max-w-7xl px-4 py-6">{children}</main>;
 
   return (
     <div className="min-h-dvh">
@@ -65,7 +79,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="mt-6 flex-1">
           <NavLinks />
         </div>
-        <p className="px-2.5 text-[11px] text-muted">Local · SQLite</p>
+        {authEnabled ? <SignOut /> : <p className="px-2.5 text-[11px] text-muted">Local · SQLite</p>}
       </aside>
 
       {/* Mobile drawer */}
@@ -82,6 +96,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <div className="mt-6">
               <NavLinks onNavigate={() => setOpen(false)} />
             </div>
+            {authEnabled && <div className="mt-auto"><SignOut /></div>}
           </aside>
         </div>
       )}

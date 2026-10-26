@@ -1,7 +1,7 @@
-import { PrismaClient } from "@prisma/client";
+import { createPrisma } from "./client";
 import { DEFAULT_TEMPLATES } from "./defaults";
 
-const prisma = new PrismaClient();
+const prisma = createPrisma();
 const force = process.argv.includes("--force");
 
 const now = new Date();

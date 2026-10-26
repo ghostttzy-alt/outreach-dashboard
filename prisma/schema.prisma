@@ -3,6 +3,8 @@
 
 generator client {
   provider = "prisma-client-js"
+  // "native" for your machine, rhel-openssl-3.0.x for Netlify's serverless functions.
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
 datasource db {

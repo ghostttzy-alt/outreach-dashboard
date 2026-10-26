@@ -1,0 +1,12 @@
+# Netlify detects Next.js and uses its Next.js runtime automatically.
+# Set these environment variables in Netlify (Site configuration → Environment variables):
+#   TURSO_DATABASE_URL, TURSO_AUTH_TOKEN  hosted database (required; SQLite files don't persist on Netlify)
+#   DASHBOARD_PASSWORD                    password for the sign-in page (required on a public URL)
+#   API_TOKEN                             optional, lets scripts call the API with "Authorization: Bearer <token>"
+[build]
+  # turso:setup creates the tables on the first deploy and does nothing after that.
+  command = "npm run turso:setup && npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
