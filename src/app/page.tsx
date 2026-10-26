@@ -7,6 +7,7 @@ import { getState } from "@/lib/settings";
 import { ActivityChart } from "@/components/overview/ActivityChart";
 import { Funnel } from "@/components/overview/Funnel";
 import { getNeedsAttention, getNeedsYou, getOverview } from "@/lib/metrics";
+import { getLeadsNeedingEmail } from "@/lib/brief";
 import { cn, formatMoney, timeAgo } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -40,12 +41,13 @@ const ACTIVITY_ICON: Record<string, React.ElementType> = {
 };
 
 export default async function OverviewPage() {
-  const [o, attention, needsYou, toApprove, state] = await Promise.all([
+  const [o, attention, needsYou, toApprove, state, needEmail] = await Promise.all([
     getOverview(),
     getNeedsAttention(),
     getNeedsYou(),
     prisma.email.count({ where: { direction: "outbound", status: "draft" } }),
     getState(),
+    getLeadsNeedingEmail(200),
   ]);
   const { send } = o;
   const alerts: { title: string; detail: string; href: string }[] = [];
@@ -95,6 +97,33 @@ export default async function OverviewPage() {
                 {n.flagged && <NeedsYouDismiss id={n.id} />}
               </li>
             ))}
+          </ul>
+        </Card>
+      )}
+
+      {needEmail.length > 0 && (
+        <Card className="mb-4 border-sky-500/40">
+          <CardHeader
+            title={<span className="flex items-center gap-2"><Mail className="size-4 text-sky-500" /> Find an email</span>}
+            description={`${needEmail.length} lead${needEmail.length === 1 ? "" : "s"} without an email address. Open the link, copy the email from their page, then paste it into the lead. The next daily run writes their first email.`}
+          />
+          <ul className="divide-y divide-border">
+            {needEmail.slice(0, 10).map((l) => {
+              const look = l.sourceUrl || l.website;
+              return (
+                <li key={l.id} className="flex items-center gap-3 px-4 py-2.5 sm:px-5">
+                  <Link href={`/leads/${l.id}`} className="min-w-0 flex-1">
+                    <span className="block text-sm font-medium">{l.businessName}</span>
+                    <span className="block truncate text-xs text-muted">{[l.niche, l.city, l.phone].filter(Boolean).join(" · ")}</span>
+                  </Link>
+                  {look && (
+                    <a href={/^https?:\/\//i.test(look) ? look : `https://${look}`} target="_blank" rel="noreferrer" className="shrink-0 text-xs text-accent underline">
+                      {l.source || "Open page"}
+                    </a>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         </Card>
       )}

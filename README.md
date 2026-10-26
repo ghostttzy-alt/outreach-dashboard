@@ -118,6 +118,8 @@ Returns:
 | `unansweredReplies[]` | `replyId`, `category`, `receivedAt`, `subject`, `text` (new text only), `fullText`, `needsYou`, `lead` (full info), `thread[]` (the whole conversation) |
 | `followUpsDue[]` | `leadId`, `type` (`followup1`/`followup2`), `dueDate`, `overdueDays`, `lead`, `previousEmails[]` (subject, body, sentAt) |
 | `interestedNeedingMockups[]` | `leadId`, `lead`, `lastReply` |
+| `leadsReadyForFirstEmail[]` | Queued leads that have an email but no email written yet (often ones you just filled in). Write their first email before finding new leads |
+| `leadsNeedingEmail[]` | Queued leads saved without an email. They show on the Overview under "Find an email" for you to look up |
 | `recentCoverage[]` | City + niche combos searched in the last 30 days: `city`, `niche`, `lastSearchedAt`, `timesSearched`, `leadsFound` |
 | `leadsByStage`, `lastRun` | Counts per stage; the previous run's summary |
 

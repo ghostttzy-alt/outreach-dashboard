@@ -10,7 +10,7 @@ export function leadInfo(l: Lead) {
   return {
     id: l.id, businessName: l.businessName, contactName: l.contactName, email: l.email, phone: l.phone,
     niche: l.niche, city: l.city, website: l.website, websiteStatus: l.websiteStatus, mainProblem: l.mainProblem,
-    score: l.score, stage: l.stage, notes: l.notes, mockupUrl: l.mockupUrl,
+    score: l.score, stage: l.stage, notes: l.notes, mockupUrl: l.mockupUrl, source: l.source, sourceUrl: l.sourceUrl,
   };
 }
 
@@ -44,10 +44,20 @@ export async function getInterestedNeedingMockups() {
   });
 }
 
+/** Queued leads with an email address and no outbound email at all yet (e.g. the user just filled the email in). */
+export function getLeadsReadyForFirstEmail(take = 50) {
+  return prisma.lead.findMany({ where: { stage: "Queued", email: { not: "" }, emails: { none: { direction: "outbound" } } }, orderBy: { createdAt: "asc" }, take });
+}
+
+/** Queued leads saved without an email address: the user looks one up (Facebook page, website) and fills it in. */
+export function getLeadsNeedingEmail(take = 50) {
+  return prisma.lead.findMany({ where: { stage: "Queued", email: "" }, orderBy: { createdAt: "asc" }, take });
+}
+
 /** Everything the daily Claude session needs, in one call. */
 export async function buildBrief() {
   const now = new Date();
-  const [send, bounce, unanswered, followUps, interested, coverage, queueCounts, stageGroups, lastRun] = await Promise.all([
+  const [send, bounce, unanswered, followUps, interested, coverage, queueCounts, stageGroups, lastRun, readyForFirst, needingEmail] = await Promise.all([
     sendStatus(now),
     bounceStats(now),
     getUnansweredReplies(),
@@ -57,6 +67,8 @@ export async function buildBrief() {
     prisma.email.groupBy({ by: ["status"], where: { direction: "outbound", status: { in: ["draft", "approved", "sending"] } }, _count: true }),
     prisma.lead.groupBy({ by: ["stage"], _count: true }),
     prisma.run.findFirst({ orderBy: { startedAt: "desc" } }),
+    getLeadsReadyForFirstEmail(),
+    getLeadsNeedingEmail(),
   ]);
   const { settings, state, ramp } = send;
   const q = Object.fromEntries(queueCounts.map((g) => [g.status, g._count]));
@@ -136,6 +148,8 @@ export async function buildBrief() {
       lead: leadInfo(l),
       lastReply: l.emails[0] ? { id: l.emails[0].id, receivedAt: l.emails[0].sentAt, text: stripQuoted(l.emails[0].body) } : null,
     })),
+    leadsReadyForFirstEmail: readyForFirst.map(leadInfo),
+    leadsNeedingEmail: needingEmail.map(leadInfo),
     recentCoverage: [...combos.values()],
     leadsByStage: Object.fromEntries(stageGroups.map((g) => [g.stage, g._count])),
     lastRun: lastRun ? { startedAt: lastRun.startedAt, status: lastRun.status, counts: lastRun.counts } : null,
