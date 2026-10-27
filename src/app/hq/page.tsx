@@ -67,6 +67,12 @@ export default async function HqPage() {
         <p className="text-xs font-medium tracking-widest text-[#8a8a8a] uppercase">Ghosttt · HQ</p>
         <h1 className="mt-1 text-3xl font-bold tracking-tight">Command Center</h1>
         <p className="mt-1 text-sm text-[#8a8a8a]">{format(now, "EEEE, MMMM d, yyyy")}</p>
+        <Link
+          href="/hq/galaxy"
+          className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-[#1f1f1f] bg-[#0a0a0a] px-3 py-2 text-xs text-white transition-all hover:border-[#3ddc97]/40 hover:shadow-[0_0_20px_rgba(61,220,151,0.12)]"
+        >
+          <span className="size-1.5 animate-pulse rounded-full bg-[#3ddc97]" /> Open the Galaxy view
+        </Link>
       </div>
 
       {/* Top KPIs */}
