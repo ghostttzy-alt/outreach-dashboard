@@ -115,10 +115,12 @@ Night 1 summary (base):
 
 **Rounds 207-208 (blocked):** API_KEY was rejected (401) in r207 and was EMPTY in r208, so no run-all, replies check or approvals. Ghost must save the real key in ~/.autopilot-env (README line ~272). r207: windsornc.com dead end. r208: outerbanks.org/restaurants returns a 388-byte bot block to curl, so skip it; try Dare County chamber (outerbankschamber.com) member pages instead.
 
+**Round 209 (short, 11 min; API_KEY still empty):** outerbankschamber.com works with plain curl (716 members). Use category pages: `/directory/index.php?src=membership&srctype=membership_lister&view=add_info&query=add_info.Business%20Category.eq.<Category>` (e.g. Builders %26 Contractors, Cleaning Services %26 Maintenance, Home Repairs %26 Maintenance, Marinas %26 Boat Services). The plain lister pages (srctype=lister&pos=N,20,716) don't show member websites, so open detail pages from category pages. No leads staged yet.
+
 **What the next round should do:**
 0. If API_KEY is in the env: `bash hq-files/run-all.sh`, then act on /api/brief
 1. Check /api/brief for any replies
-2. More leads, same method: start with Outer Banks via outerbankschamber.com member pages (outerbanks.org blocks curl), Beaufort (beaufortnc.org was 403; try other domains). When Chrome connects: Elizabeth City + Goldsboro Wix directories, and Facebook pages of the 22 New Bern sites without emails.
+2. More leads, same method: start with Outer Banks via outerbankschamber.com category pages (see r209) (outerbanks.org blocks curl), Beaufort (beaufortnc.org was 403; try other domains). When Chrome connects: Elizabeth City + Goldsboro Wix directories, and Facebook pages of the 22 New Bern sites without emails.
 3. Make 6 more Shorts (scripts 13-14 + 4 new original topics, different formats from prev nights)
 4. When Chrome connects: check Facebook pages of Ginger's Boutique + Kwalitstuff (Tarboro) for an email, then send the gbp-offer.md email
 5. Build free website speed/mobile check page (idea bank #5)
