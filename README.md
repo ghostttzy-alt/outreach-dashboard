@@ -267,7 +267,7 @@ src/lib/gmail.ts            Gmail OAuth, sending, reading (REST, no SDK)
 
 ## Autopilot
 
-`bash autopilot/run.sh <hours>` runs Claude Code in rounds of about 45 minutes using `autopilot/prompt.md`. It restarts after dropped connections, waits for Claude usage limits to reset, keeps the Mac awake, and logs to `~/autopilot-logs`.
+`bash autopilot/run.sh <hours>` runs Claude Code (Sonnet by default, set AUTOPILOT_MODEL to change it) in short rounds with 20-minute breaks using `autopilot/prompt.md`, to save Claude usage. It restarts after dropped connections, waits for Claude usage limits to reset, keeps the Mac awake, and logs to `~/autopilot-logs`.
 
 To let the autopilot use the dashboard API, save the API key once (it stays outside the repo):
 

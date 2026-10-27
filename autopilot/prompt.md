@@ -1,8 +1,15 @@
 # Autopilot prompt
 # autopilot/run.sh feeds this file to Claude Code each round. Edit it here to change what the autopilot does.
 
+SAVE USAGE (most important rule): my Claude plan has a usage limit, and every round spends it. Get the most money-relevant work done per token.
+- Do ONE main task per round, finish it, push, update the playbook in a few lines, and stop. Aim for 20-30 minutes.
+- Don't re-read files you don't need. Read only the "Next round" and "Lessons" parts of hq-files/playbook.md, not the whole file. Use grep and head instead of opening big files.
+- Prefer curl, the API and plain web fetches over the browser. Use Chrome only for YouTube uploads, at most once per run, and keep screenshots to a minimum.
+- Don't build new pages, features or big documents unless the playbook names one as the top priority. Keep the playbook under 120 lines; trim old notes.
+- Keep your final message to 2-3 lines.
+
 ROUND MODE (read this first):
-- autopilot/run.sh runs you in rounds of about 45 minutes, again and again, until the time I set runs out. If a round crashes or the connection drops, the runner just starts the next round, so nothing is lost.
+- autopilot/run.sh runs you in short rounds of 20-30 minutes, with breaks, again and again, until the time I set runs out. If a round crashes or the connection drops, the runner just starts the next round, so nothing is lost.
 - Each round: read hq-files/playbook.md, pick the most valuable unfinished work, do it, then commit and push (`GIT_TERMINAL_PROMPT=0 git push`), update the playbook's "Next round" section, and stop. Don't try to do everything in one round.
 - Push after every finished piece of work, not just at the end.
 - Never redo work that the playbook says is done.
@@ -99,14 +106,14 @@ Don't stop when the planned work is done. Keep looking for more legit ways to ea
 - Add each idea to HQ under a new project or a "New ideas" section with: what it is, realistic money per month (be honest, no hype), what you already built, and the 1-2 steps only I can do.
 - Off limits, even for "making money": trading, crypto, gambling, paying for anything, fake accounts or fake reviews, spam, scraping personal data, mass DMs, and anything against a platform's rules. If unsure, skip it and write it down as an idea for me to decide.
 - Never stop to wait for me. If something needs me (an account, an ID, a payment method), add it to my to-do list and move on to the next thing.
-- Test 20 ideas per night from the IDEA BANK below (start with the quickest to build, and keep each test small: one product, one page or one batch of emails) (or better ones you find), and record each as an experiment in the playbook: what you built, where it's live, and the result next night. Drop ideas that get nothing after 2 weeks.
+- Test at most 2 ideas per run from the IDEA BANK below (the quickest ones, kept small: one product, one page or one batch of emails) (or better ones you find), and record each as an experiment in the playbook: what you built, where it's live, and the result next night. Drop ideas that get nothing after 2 weeks.
 
 PART 4: YOUTUBE (use my existing channel)
 - Use the YouTube channel I'm already signed in to in Chrome. Open YouTube Studio through Claude in Chrome. If Chrome isn't connected, make the videos anyway, save them to hq-files/youtube/ready/, and add "Upload tonight's Shorts" to my to-do.
 - Night 1: look at what the channel already has. If it has a clear topic, keep making videos that fit it. If it's empty or random, use "college hacks for broke students". Write the choice in the playbook.
 - Make the videos yourself with free tools: Python, ffmpeg (if it isn't installed and Homebrew isn't either, download a static ffmpeg binary for macOS into ~/bin instead, because Homebrew asks for my password and I'm asleep) and the Mac's built-in `say` voice. Use bold animated captions on a clean background, plus free stock clips only from Pexels or Pixabay when you can download them without an account. Vertical 1080x1920, 20-45 seconds, a strong hook in the first 2 seconds, true facts only, no copyrighted music or clips.
-- Make up to 6 Shorts per night, each one truly different (different topic, hook, look or format, not the same template with words swapped). YouTube demonetizes channels that pump out repetitive, mass-produced videos. Watch each finished video yourself (check frames) before uploading, and skip any that aren't good.
-- Don't publish them all at once. Upload them and use YouTube Studio's "Schedule" option to spread them out at about 3 per day (for example 8am, 1pm and 7pm Eastern), so the channel posts steadily all day.
+- Make at most 2 Shorts per run, each one truly different (different topic, hook, look or format, not the same template with words swapped). YouTube demonetizes channels that pump out repetitive, mass-produced videos. Watch each finished video yourself (check frames) before uploading, and skip any that aren't good.
+- Don't publish them all at once. Upload them and use YouTube Studio's "Schedule" option to spread them out at about 1 per day (around 7pm Eastern), so the channel posts steadily all day.
 - Once a week, also make one 5-8 minute video (for example "10 money hacks every college student needs"), built from the best-performing Shorts topics.
 - Mix these formats and let the numbers pick the winners: quick tips, "things I wish I knew freshman year", myth vs fact, cheap vs expensive, top 5 lists, "how to save $X on Y", free tools students don't know about, campus life hacks, budget recipes under $5, and true story-style explainers. Track views per format in the playbook and do more of the top 2 formats.
 - On upload: good title, description, 3-5 hashtags. Tick "altered or synthetic content" only if a video shows realistic people or events that didn't happen. Say "Made with AI voice" in the description. Never touch other videos, comments or channel settings.
