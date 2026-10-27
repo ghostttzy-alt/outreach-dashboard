@@ -113,16 +113,12 @@ Night 1 summary (base):
 
 **Round 206 (done, no new leads):** Hertford/Plymouth/Manteo sources were dead ends (see Lessons). Staged total unchanged: ~102 local + 26 agencies.
 
-**Round 207 (done, no new leads):** short round; windsornc.com dead end (see Lessons). Staged total unchanged.
-
-**Round 207 (blocked):** API_KEY in ~/.autopilot-env was rejected (401) by /api/brief, so no run-all, replies check or approvals happened. Ghost must re-save the real key (README line ~272), then next round resumes at step 0.
-
-**Round 208 (blocked):** API_KEY still 401; nothing needing the dashboard was possible.
+**Rounds 207-208 (blocked):** API_KEY was rejected (401) in r207 and was EMPTY in r208, so no run-all, replies check or approvals. Ghost must save the real key in ~/.autopilot-env (README line ~272). r207: windsornc.com dead end. r208: outerbanks.org/restaurants returns a 388-byte bot block to curl, so skip it; try Dare County chamber (outerbankschamber.com) member pages instead.
 
 **What the next round should do:**
 0. If API_KEY is in the env: `bash hq-files/run-all.sh`, then act on /api/brief
 1. Check /api/brief for any replies
-2. More leads, same method: start with Outer Banks (outerbanks.org dining lists), Beaufort (beaufortnc.org was 403; try other domains). When Chrome connects: Elizabeth City + Goldsboro Wix directories, and Facebook pages of the 22 New Bern sites without emails.
+2. More leads, same method: start with Outer Banks via outerbankschamber.com member pages (outerbanks.org blocks curl), Beaufort (beaufortnc.org was 403; try other domains). When Chrome connects: Elizabeth City + Goldsboro Wix directories, and Facebook pages of the 22 New Bern sites without emails.
 3. Make 6 more Shorts (scripts 13-14 + 4 new original topics, different formats from prev nights)
 4. When Chrome connects: check Facebook pages of Ginger's Boutique + Kwalitstuff (Tarboro) for an email, then send the gbp-offer.md email
 5. Build free website speed/mobile check page (idea bank #5)
