@@ -1,109 +1,44 @@
-# Morning Summary — Night 1 (Oct 27, 2026)
+# Morning Summary — Night 2 Autopilot Round
+
+**Date:** 2026-10-27 (autopilot round, ~45 min)
+**Revenue earned:** $0 (products not yet listed, emails not yet sending)
+
+---
 
 ## What Got Built
 
-### HQ Dashboard (/hq)
-- Full dashboard at `/hq` behind existing auth — black minimal design (Linear/Vercel style)
-- Three pages: Overview (KPIs + venture cards), Venture detail (`/hq/[slug]`), Revenue log (`/hq/revenue`)
-- 9 API endpoints at `/api/hq/*`: overview, ventures, tasks, items, revenue, logs, approve-drafts, leads-export
-- 5 ventures seeded in DB: web-design, lead-lists, admin-addon, etsy, youtube
-- HQ nav link added to sidebar
+1. **6 new YouTube Shorts** — `hq-files/youtube/ready/short7` through `short12`
+   - Different topics from Night 1: eating on $25/week, free school software, freshman money mistakes, $5 meals, splitting costs, free campus food
+   - Different visual styles: varies bg color and accent color per video
+   - Same Pillow+ffmpeg+say pipeline, each 28–35 seconds
+   - Total: 12 Shorts ready to upload
 
-### Care Plan Page (/care) — PUBLIC marketing page
-- URL: https://ghostzy.netlify.app/care
-- Three tiers: Starter $49/mo, Standard $79/mo (highlighted), Full Service $129/mo
-- Admin add-on section: $100–200/mo
-- Share this link with anyone asking about ongoing website maintenance
+2. **20 new leads with confirmed emails** — `hq-files/add-leads-n2.sh`
+   - 12 Greenville NC businesses from ECU's approved catering list (all emails confirmed on ecu.edu)
+   - 8 NC marketing agencies with emails confirmed on their own websites
+   - Key finds: Red Shark Digital in Greenville NC, Eleven11 Digital in Fayetteville NC
+   - Run `API_KEY=your_key bash hq-files/add-leads-n2.sh` after getting the API key from Netlify
 
-### Etsy Digital Products — 3 PDFs ready to list
-All files in `hq-files/etsy/`:
-- **College Budget Planner** — 9 pages, price $4.99 → `college-budget-planner.pdf`
-- **Small Business Invoice Kit** — 7 pages, price $5.99 → `small-business-invoice-kit.pdf`
-- **Notion Student Dashboard** — 3 pages, price $3.99 → `notion-student-dashboard.pdf`
-- Full listing text (titles, descriptions, 13 tags each) in `hq-files/etsy/product-research.md`
-
-### YouTube Shorts — 6 videos ready to upload
-All files in `hq-files/youtube/ready/`:
-
-| File | Title | Angle |
-|------|-------|-------|
-| short1-5-free-tools.mp4 | 5 Free Tools Every Broke Student Needs | List (Libby, Zotero, Notion, Khan, Writing Center) |
-| short2-textbook-hack.mp4 | Never Pay Full Price for a Textbook Again | Step-by-step (library → OpenStax → rent → old edition) |
-| short3-free-campus-gym.mp4 | You're Paying for a Gym and Not Using It | Campus rec center hack |
-| short4-coffee-math.mp4 | $5 Coffee 3x/Week = $780/Year | Math shock → French press fix |
-| short5-get-paid-notes.mp4 | Get Paid to Take Notes in Class | 3 ways (disability services, sell notes, tutor) |
-| short6-free-bank-account.mp4 | Stop Paying Your Bank $144 a Year | Free bank account options |
-
-**Upload instructions:**
-1. Go to studio.youtube.com → Create → Upload videos
-2. Upload all 6 files
-3. Title: use the title in the table above
-4. Description: 2–3 sentences expanding the tip + "Follow for more college money hacks."
-5. Tags: `#collegehacks #brokecollegestudent #studentlife #moneytips #college`
-6. Tick **"Altered or synthetic content"** (AI-generated voice — required by YouTube)
-7. Schedule: spread across 2 days — 3 today, 3 tomorrow. Best times: 8am, 1pm, 7pm Eastern.
-
-### Agency Lead List — 1 confirmed email
-- **LT Web Designs** — lisa@ltwebdesigns.com — Enfield, NC — (252) 883-2504
-- This is a small NC web design agency. Good fit for buying a local lead list sample.
-
-### Local Business Leads — 7 leads prepped (need emails)
-Script ready at `hq-files/add-leads.sh`. Run after deploy:
-```bash
-API_KEY=your_key bash hq-files/add-leads.sh
-```
-Businesses without emails (look up on Google or their Google Business profile):
-- 2nd Street Cafe, Ayden NC — (252) 712-4051
-- Doghouse Tavern, Ayden NC — (252) 304-9189
-- Gwendy's Cafe and Bakery, Ayden NC — (252) 414-8716
-- The Hometown Salon, Ayden NC — (252) 481-7507
-- Coltrain Hardware and Garden Center, Ayden NC — (252) 304-2153
+3. **`/free` resources page** — live at ghostzy.netlify.app/free
+   - Shows 3 digital products (budget planner, invoice kit, Notion dashboard)
+   - Lists upcoming YouTube videos by topic
+   - Links to /care for business owners
+   - Clean dark design matching the rest of the site
 
 ---
 
-## Your Top 5 To-Dos This Morning
+## Your To-Do List (5 items, by money impact)
 
-### 1. Open an Etsy shop and upload the 3 PDFs
-- Go to etsy.com/sell → set up your shop (takes ~10 min)
-- Upload the 3 PDF files from `hq-files/etsy/`
-- Copy the listing text from `hq-files/etsy/product-research.md` (titles, descriptions, tags already written)
-- This is the fastest path to the first dollar
-
-### 2. Upload the 6 YouTube Shorts
-- Go to studio.youtube.com
-- Upload all 6 from `hq-files/youtube/ready/`
-- Use the schedule above — don't post all 6 at once
-
-### 3. Add leads via the API
-- Get your API key from the Netlify dashboard (Site settings → Environment variables → `API_KEY`)
-- Run: `API_KEY=your_key bash hq-files/add-leads.sh`
-- Then look up emails for the Ayden businesses (Google each one)
-- Once they have emails, the outreach system will write their intro emails
-
-### 4. Check the HQ dashboard
-- Go to https://ghostzy.netlify.app/hq (after deploy finishes)
-- You'll see all 5 ventures, their status, and your to-do items
-- Mark tasks done as you finish them
-
-### 5. Share the /care page
-- URL: https://ghostzy.netlify.app/care
-- Drop this in your next conversation when someone asks about website maintenance
-- Every client you already have is a potential $49–129/mo add-on
+1. **Get your API key from Netlify** and run `add-leads.sh` then `add-leads-n2.sh` to add 28 leads with real emails to the dashboard so outreach can start
+2. **Connect Gmail** in the dashboard settings so emails can actually send
+3. **Upload all 12 Shorts** from `hq-files/youtube/ready/` to YouTube Studio — schedule 3/day
+4. **Open a Gumroad account** (free) and list the 3 products from `hq-files/etsy/` — takes 20 min
+5. **Open an Etsy shop** ($0.20 per listing) and upload the same 3 PDFs for passive income
 
 ---
 
-## Revenue Status
-- **Earned last night:** $0 (everything built, nothing listed yet)
-- **Closest to $10:** Etsy → list the PDFs first, they can sell within hours
-- **Second closest:** care plan upsell to an existing client
-
----
-
-## Overnight Build Stats
-- Files created: ~30+
-- Database migrations: 1 (5 new tables, additive only)
-- API routes: 9
-- Pages: 4 (/hq, /hq/[slug], /hq/revenue, /care)
-- YouTube videos: 6
-- Etsy PDFs: 3
-- Leads found: 8 (1 with email confirmed)
+## The Big Picture
+- Outreach can't start until Gmail is connected and leads are added via the API
+- The YouTube channel is the best path to organic traffic right now — 12 Shorts ready
+- The /free page and /care page are live and look good — just need traffic
+- $10 first dollar is blocked on #1 and #2 above (connecting Gmail + adding leads)

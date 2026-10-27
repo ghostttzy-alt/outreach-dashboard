@@ -3,45 +3,56 @@
 > This is Claude's memory across nights. Read this first every night. Keep under 300 lines.
 
 ## What Night Is This?
-Night 1 of operations. Started: 2026-10-27.
+Night 2 of operations. Started: 2026-10-27.
 
 ## Channel: college-hacks-for-broke-students
 YouTube niche confirmed: "College hacks for broke students" — I'm a college student so it fits. Track views per format and do more of top 2.
 
 ## Last Night's Numbers
-Night 1 (first night — no prior data):
-- Leads added: TBD (check after push and seed)
-- Emails sent: 0 (ramp not started yet — Gmail needs connecting)
+Night 2 (autopilot round 1, 45 min):
+- Leads added: +20 staged (12 local biz + 8 agencies in add-leads-n2.sh — user needs to run)
+- Emails sent: 0 (no API key set locally; DB connection needed)
 - Bounce rate: 0%
-- YouTube views: 0 (channel just starting)
+- YouTube: 6 new Shorts made and in hq-files/youtube/ready/ (short7–short12)
 - Revenue: $0
 
+Night 1 summary (base):
+- HQ, care plan, lead lists, YouTube scripts, admin addon, Etsy PDFs — all done
+
 ## What's Working
-- Nothing tracked yet (night 1)
+- YouTube Shorts production: fast with Pillow + ffmpeg + macOS say. Made 6/night.
+- ECU catering list: gold mine of Greenville NC business emails (12 confirmed)
+- Agency contact pages: ~50% yield on email when fetched directly
 
 ## What Isn't Working
-- Nothing tracked yet (night 1)
+- Local server: no .env set up locally, can't access DB or API
+- Web search for emails: poor yield; direct page fetching works better
+- Deployed API: user hasn't set API_KEY yet, so scripts can't be run
 
 ## Running Experiments
 | # | What | Built | Status |
 |---|------|-------|--------|
 | 1 | Care plan page at /care | Yes — live | Running |
 | 2 | Etsy listings (3 products) | PDFs made, listing not live | Waiting for Etsy shop |
-| 3 | Agency lead list pitch | Emails written, in queue | Running |
-| 4 | YouTube Shorts | Scripts written, videos TBD | In progress |
+| 3 | Agency lead list pitch | 8 new agencies staged | Waiting for API key |
+| 4 | YouTube Shorts | 12 total (6 N1 + 6 N2) | In progress |
+| 5 | /free resources page | Live | Running |
 
-## Tonight's Priorities (Night 2+)
-1. Check brief for replies and approve outstanding drafts
-2. Find 20+ local business leads in eastern NC (Greenville, Ayden, Kinston, Goldsboro, Wilson)
-3. Write first emails for all queued leads
-4. Make YouTube Shorts (up to 6)
-5. Check agency emails — any interested?
-6. Update this playbook with real numbers
+## Tonight's Priorities (Night 3+)
+1. Check /api/brief for any replies or bounces
+2. If API key is available: run add-leads-n2.sh, add-leads.sh, add-hq-logs-n2.sh
+3. Find 15 more agencies to get to 25+ with real emails
+4. Find 20+ more local business leads with emails (try chamber of commerce sites, Yelp pages with emails)
+5. Make 6 more Shorts (scripts 8, 10, 13, 14 + 2 new topics)
+6. Upload Shorts to YouTube Studio if Chrome is connected
+7. Test idea bank ideas: Google Business Profile setup offer, QR code menus, free website speed check
 
-## Lessons (start tracking after night 2)
-- [ ] Track which subject lines get replies
-- [ ] Track which niches respond best in eastern NC
-- [ ] Track which YouTube formats get most views
+## Lessons
+- ECU and similar institution public pages are great for finding local business emails
+- Direct page fetching beats web search for finding contact emails
+- Keep Shorts to 28–35 seconds — the voice output + slides run longer than you'd expect
+- Different visual styles per video: vary bg color and accent color each night
+- The Pillow + ffmpeg pipeline works well: render PNG slides, generate aiff audio, concat
 
 ## Idea Bank Progress (20 per night)
 ### Night 1 — Built
@@ -56,45 +67,41 @@ Night 1 (first night — no prior data):
 9. 14 YouTube scripts — DONE
 10. Care plan upsell paragraph (hq-files/care-plan.md) — DONE
 
-### Night 1 — To Do (from idea bank)
-11. Google Business Profile setup offer — add to email templates
-12. Find NC Secretary of State new business filings
-13. Make Gumroad listings for Etsy products (if logged in)
-14. Free website speed/mobile check email hook
-15. NC local business directory page
-16. Restaurant menu redesign offer
-17. QR code menu service
-18. "Website rescue" for broken sites
-19. Social media template pack
-20. Mini-guide: free AI tools for small business owners
+### Night 2 — Built
+11. 6 new YouTube Shorts (short7–short12, different styles) — DONE
+12. 20 new leads with confirmed emails staged (add-leads-n2.sh) — DONE
+13. /free resources page — DONE
+14. 8 NC agency leads with confirmed emails — DONE
 
-## Night 1 — FULLY COMPLETE (pushed to main, Netlify deploying)
-- HQ dashboard at /hq with 5 venture pages — DONE
-- /care page live (public) — DONE
-- 9 API routes at /api/hq/* — DONE
-- Prisma migration + seed — DONE
-- 3 Etsy PDFs in hq-files/etsy/ — DONE (user still needs to open Etsy shop)
-- 6 YouTube Shorts in hq-files/youtube/ready/ — DONE (user still needs to upload)
-- 14 video scripts in hq-files/faceless/scripts.md — DONE
-- Care plan copy + admin checklist — DONE
-- Agency lead found: lisa@ltwebdesigns.com (LT Web Designs, Enfield NC) — DONE
-- hq-files/add-leads.sh ready for user to run once API key is obtained — DONE
-- hq-files/morning-summary.md written — DONE
-- All pushed to GitHub (commit bd12d73) — DONE
+### Night 2 — To Do (from idea bank)
+15. Google Business Profile setup offer — add to email templates
+16. Free website speed/mobile check email hook
+17. NC local business directory page
+18. Restaurant menu redesign offer
+19. QR code menu service
+20. "Website rescue" for broken sites
+21. Social media template pack
+22. Mini-guide: free AI tools for small business owners
+23. Find 15 more agencies (need 25+ total)
+24. New NC businesses from Secretary of State filings
 
-## Where I Am Now (autopilot round start)
-This is the autopilot runner. Night 1 code is live on Netlify.
+## Where I Am Now (after Night 2 autopilot round)
+**Files committed this round:**
+- hq-files/youtube/ready/short7–short12.mp4 (6 new Shorts)
+- hq-files/add-leads-n2.sh (20 leads with confirmed emails)
+- hq-files/add-hq-logs-n2.sh (log entries for Night 2)
+- src/app/free/page.tsx (/free resources page, live on Netlify)
 
 **What still needs the user:**
-1. Open Etsy shop → upload 3 PDFs from hq-files/etsy/
-2. Upload 6 Shorts from hq-files/youtube/ready/ to YouTube Studio
-3. Get API key from Netlify → run hq-files/add-leads.sh to add Night 1 leads
-4. Connect Gmail to dashboard so outreach can start sending
+1. Get API key from Netlify → run hq-files/add-leads.sh and hq-files/add-leads-n2.sh
+2. Upload all 12 Shorts from hq-files/youtube/ready/ to YouTube Studio
+3. Open Etsy/Gumroad account → list 3 products from hq-files/etsy/
+4. Connect Gmail to dashboard so outreach starts sending
 
-**What the autopilot should do next:**
-1. Check /api/brief for any replies
-2. Find more eastern NC leads with real emails (Greenville, Kinston, Wilson, Goldsboro, Rocky Mount)
-3. Write and approve email drafts for any leads that already have emails
-4. Make 6 new YouTube Shorts (new topics, different formats from Night 1)
-5. Improve /care page or add Gumroad product links if user is logged in
-6. Test 10 more ideas from the idea bank
+**What the next round should do:**
+1. Check /api/brief for replies
+2. Find 15 more agencies (try DesignRush NC, Clutch NC, BrightLocal NC)
+3. Find 20+ more local leads via chamber/Yelp/Google pages with emails
+4. Make 6 more Shorts (remaining scripts + 2 new formats)
+5. Build free website speed check page (idea bank #5)
+6. Build Google Business Profile offer email template (idea bank #1)
