@@ -54,6 +54,7 @@ Night 1 summary (base):
 - downtownwilson.org and downtowngoldsboro.org don't resolve, originalwashington.com fails SSL (r201). Try other domains for them via search.
 - downtownkinston.com has no business directory (404); swansboro-nc.org is the town gov site. visitedenton.com lists works well (r203)
 - Town gov sites with a /business-directory page (townoforiental.com) are gold: one fetch gives 60 outbound business links (r204)
+- Webflow chamber sites (pamlicochamber.com/members) serve every member page to curl; fetch all in parallel, then grep each member's own site (r205)
 - Only tick YouTube "altered or synthetic content" for realistic fake people/events, not just for an AI voice
 
 ## Idea Bank Progress (20 per night)
@@ -102,18 +103,16 @@ Night 1 summary (base):
 
 **Rounds 197-199 (done):** 26 agencies staged (goal met), run-all.sh built, gbp-offer.md written; Tarboro prospects Ginger's Boutique + Kwalitstuff have dead sites (need email via Facebook).
 
-**Rounds 200-201 (done):** downtown Greenville (20) + New Bern (12) leads staged via directory pages + curl of own sites.
-
-**Round 202 (done):** Chrome not connected, no API_KEY. Downtown-directory method on Morehead City: 16 leads staged in hq-files/add-leads-r202.sh (4 restaurants, cafe, family cafe, bar, galleries, shops, thrift store, bodywork, marine services; all emails from the business's own site, all sites working, so pitch care plan / small fixes). Skipped Downtown Barre (email only seen in a social URL, not confirmed) and chains (Port 32, Ladyfingers of Raleigh). Added to run-all.sh. Staged total: ~68 local + 26 agencies.
-
-**Round 203 (done):** Chrome not connected, no API_KEY. Edenton via visitedenton.com (dining/shopping/B&B pages): 6 leads staged in hq-files/add-leads-r203.sh (coffee house, caterer, campground, gourmet shop, B&B, restaurant; emails from own sites). Skipped emails only shown on visitedenton (Chowan Arts, Mill Village Museum) and ehcnc.org (two conflicting emails). Added to run-all.sh. Staged total: ~74 local + 26 agencies.
+**Rounds 200-203 (done):** downtown Greenville (20), New Bern (12), Morehead City (16), Edenton (6) leads staged via directory pages + curl of own sites.
 
 **Round 204 (done):** Chrome not connected, no API_KEY. Oriental via townoforiental.com/business-directory (links to ~60 sites): 17 leads staged in hq-files/add-leads-r204.sh (restaurant, coffee, 2 B&Bs, 3 lodging, 3 marinas, boat yard/services, charter, realty, spa, barber, contractor, yacht broker; emails from own sites). Skipped Baldheaded Bobby (only email was the web designer's) and Sail Loft Rentals (same firm as Sail Loft Realty). Added to run-all.sh. Staged total: ~91 local + 26 agencies.
+
+**Round 205 (done):** Chrome not connected, no API_KEY. Pamlico County via pamlicochamber.com/members (129 member pages, Webflow, plain curl works): 11 leads staged in hq-files/add-leads-r205.sh (pharmacy, florist, law firm, insurance, 2 realty, brewery, pest control, appliance store, 2 marinas; Bayboro/Merritt/Minnesott Beach/Oriental/New Bern; emails from own sites). Skipped r204 dupes, gov/schools/chains, Black Sheep Signs (email domain differs from site). 5 members have NO website (Daily Bread Christian Bookstore, Delamar & Delamar, Diversified Auto & Tire, Flockhart Grocery, Brinson Hauling) = best new-site prospects once an email turns up via Facebook. Staged total: ~102 local + 26 agencies.
 
 **What the next round should do:**
 0. If API_KEY is in the env: `bash hq-files/run-all.sh`, then act on /api/brief
 1. Check /api/brief for any replies
-2. More leads, same method: try Bayboro/Pamlico chamber (pamlicochamber.com), Plymouth, Hertford, Manteo/Outer Banks visitor-site dining/shopping lists, Beaufort (beaufortnc.org was 403; try other domains). When Chrome connects: Elizabeth City + Goldsboro Wix directories, and Facebook pages of the 22 New Bern sites without emails.
+2. More leads, same method: try Plymouth, Hertford, Manteo/Outer Banks visitor-site dining/shopping lists, Beaufort (beaufortnc.org was 403; try other domains). When Chrome connects: Elizabeth City + Goldsboro Wix directories, and Facebook pages of the 22 New Bern sites without emails.
 3. Make 6 more Shorts (scripts 13-14 + 4 new original topics, different formats from prev nights)
 4. When Chrome connects: check Facebook pages of Ginger's Boutique + Kwalitstuff (Tarboro) for an email, then send the gbp-offer.md email
 5. Build free website speed/mobile check page (idea bank #5)
