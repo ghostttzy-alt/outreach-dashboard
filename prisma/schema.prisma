@@ -219,6 +219,79 @@ model Settings {
   pausedAt     DateTime?
 }
 
+/// HQ: one row per project / side business tracked in the HQ dashboard.
+model Venture {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String   @default("")
+  status      String   @default("Not started") // Not started | Setting up | Live | Earning
+  nextStep    String   @default("")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tasks    VentureTask[]
+  items    VentureItem[]
+  revenues Revenue[]
+  logs     HqLog[]
+}
+
+model VentureTask {
+  id        String   @id @default(cuid())
+  ventureId String
+  venture   Venture  @relation(fields: [ventureId], references: [id], onDelete: Cascade)
+  owner     String   @default("claude") // claude | me
+  title     String
+  done      Boolean  @default(false)
+  priority  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ventureId])
+}
+
+model VentureItem {
+  id        String   @id @default(cuid())
+  ventureId String
+  venture   Venture  @relation(fields: [ventureId], references: [id], onDelete: Cascade)
+  type      String   @default("prospect") // prospect | product | video | client | agency | other
+  status    String   @default("active") // active | done | paused | dropped
+  title     String
+  url       String   @default("")
+  details   Json     @default("{}")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ventureId])
+  @@index([type])
+}
+
+model Revenue {
+  id        String   @id @default(cuid())
+  ventureId String
+  venture   Venture  @relation(fields: [ventureId], references: [id], onDelete: Cascade)
+  amount    Float
+  isMonthly Boolean  @default(false)
+  client    String   @default("")
+  note      String   @default("")
+  date      DateTime @default(now())
+  createdAt DateTime @default(now())
+
+  @@index([ventureId])
+  @@index([date])
+}
+
+model HqLog {
+  id        String   @id @default(cuid())
+  ventureId String?
+  venture   Venture? @relation(fields: [ventureId], references: [id], onDelete: SetNull)
+  project   String   @default("")
+  note      String
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
 /// Internal state that is never shown or edited directly.
 model SystemState {
   id Int @id @default(1)

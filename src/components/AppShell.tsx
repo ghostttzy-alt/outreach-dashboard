@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Bot, Briefcase, CheckSquare, Globe, LayoutDashboard, LogOut, MapPinned, Menu, Send, Settings, Users, X } from "lucide-react";
+import { Bot, Briefcase, CheckSquare, Globe, LayoutDashboard, LogOut, MapPinned, Menu, Send, Settings, Users, X, LayoutGrid } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { GlobalSearch } from "./GlobalSearch";
 import { ThemeToggle } from "./ThemeToggle";
@@ -18,6 +18,7 @@ const NAV = [
   { href: "/coverage", label: "Coverage", icon: MapPinned },
   { href: "/runs", label: "Runs", icon: Bot },
   { href: "/settings", label: "Settings", icon: Settings },
+  { href: "/hq", label: "HQ", icon: LayoutGrid },
 ];
 
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {

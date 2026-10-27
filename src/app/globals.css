@@ -79,3 +79,20 @@ body {
 .scrollbar-thin {
   scrollbar-width: thin;
 }
+
+/* HQ dashboard: always dark, pure black */
+.hq-theme {
+  --bg: #000000;
+  --panel: #0a0a0a;
+  --panel-2: #111111;
+  --border: #1f1f1f;
+  --border-strong: #2a2a2a;
+  --fg: #ffffff;
+  --muted: #8a8a8a;
+  --accent: #3ddc97;
+  --accent-fg: #000000;
+  --ring: rgba(61, 220, 151, 0.35);
+  color-scheme: dark;
+  background: #000000;
+  color: #ffffff;
+}

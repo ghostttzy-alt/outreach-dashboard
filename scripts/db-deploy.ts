@@ -18,3 +18,5 @@ if (!/^postgres(ql)?:\/\//.test(url)) {
   process.exit(1);
 }
 execSync("npx prisma migrate deploy", { stdio: "inherit", env: { ...process.env, DATABASE_URL: directUrl(url) } });
+// Seed HQ ventures (idempotent — skips if already seeded)
+execSync("npx tsx prisma/seed-hq.ts", { stdio: "inherit" });

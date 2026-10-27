@@ -25,5 +25,5 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   // Public: the sign-in page and its API, mockup previews, and static files.
-  matcher: ["/((?!login|api/auth/login|preview/|_next/static|_next/image|favicon.ico|robots.txt).*)"],
+  matcher: ["/((?!login|care|api/auth/login|preview/|_next/static|_next/image|favicon.ico|robots.txt).*)"],
 };

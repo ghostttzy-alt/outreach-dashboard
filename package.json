@@ -15,7 +15,8 @@
     "db:studio": "prisma studio",
     "postinstall": "prisma generate",
     "db:deploy": "tsx scripts/db-deploy.ts",
-    "db:migrate": "prisma migrate dev"
+    "db:migrate": "prisma migrate dev",
+    "db:seed-hq": "tsx prisma/seed-hq.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
