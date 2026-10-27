@@ -41,15 +41,6 @@ Night 1 summary (base):
 | 4 | YouTube Shorts | 24 total (6 N1 + 18 N2) | Waiting for upload |
 | 5 | /free resources page | Live | Running |
 
-## Tonight's Priorities (Night 3+)
-1. Check /api/brief for any replies or bounces
-2. If API key is available: run add-leads-n2.sh, add-leads.sh, add-hq-logs-n2.sh
-3. Find 15 more agencies to get to 25+ with real emails
-4. Find 20+ more local business leads with emails (try chamber of commerce sites, Yelp pages with emails)
-5. Make 6 more Shorts (scripts 8, 10, 13, 14 + 2 new topics)
-6. Upload Shorts to YouTube Studio if Chrome is connected
-7. Test idea bank ideas: Google Business Profile setup offer, QR code menus, free website speed check
-
 ## Lessons
 - ECU and similar institution public pages are great for finding local business emails
 - Direct page fetching beats web search for finding contact emails
@@ -62,6 +53,7 @@ Night 1 summary (base):
 - downtownwashingtonnc.com is behind Cloudflare (blocked), downtownbeaufort.com is empty, downtownrockymount.com 403, wilsondowntown.com is an apartment site (r202)
 - downtownwilson.org and downtowngoldsboro.org don't resolve, originalwashington.com fails SSL (r201). Try other domains for them via search.
 - downtownkinston.com has no business directory (404); swansboro-nc.org is the town gov site. visitedenton.com lists works well (r203)
+- Town gov sites with a /business-directory page (townoforiental.com) are gold: one fetch gives 60 outbound business links (r204)
 - Only tick YouTube "altered or synthetic content" for realistic fake people/events, not just for an AI voice
 
 ## Idea Bank Progress (20 per night)
@@ -110,18 +102,18 @@ Night 1 summary (base):
 
 **Rounds 197-199 (done):** 26 agencies staged (goal met), run-all.sh built, gbp-offer.md written; Tarboro prospects Ginger's Boutique + Kwalitstuff have dead sites (need email via Facebook).
 
-**Round 200 (done):** Chrome not connected, no API_KEY. Scraped business links from downtowngreenville.com directory pages, then curl'd each site's home, /contact, /contact-us, /about. Staged 20 new Greenville leads in hq-files/add-leads-r200.sh (bulk POST, all emails from the business's own site; skipped chains and a Charleston violin shop). All 20 have working sites (1 no HTTPS), so pitch care plan / small fixes. Added to run-all.sh. Staged total: ~40 local + 26 agencies.
-
-**Round 201 (done):** Chrome not connected, no API_KEY. Same method on downtown New Bern: 12 leads staged in hq-files/add-leads-r201.sh (restaurants, cafe, brewery, bar, 2 shops, family fun center; all emails from the business's own site, all sites working, so pitch care plan / small fixes). Added to run-all.sh. Staged total: ~52 local + 26 agencies. Build passed.
+**Rounds 200-201 (done):** downtown Greenville (20) + New Bern (12) leads staged via directory pages + curl of own sites.
 
 **Round 202 (done):** Chrome not connected, no API_KEY. Downtown-directory method on Morehead City: 16 leads staged in hq-files/add-leads-r202.sh (4 restaurants, cafe, family cafe, bar, galleries, shops, thrift store, bodywork, marine services; all emails from the business's own site, all sites working, so pitch care plan / small fixes). Skipped Downtown Barre (email only seen in a social URL, not confirmed) and chains (Port 32, Ladyfingers of Raleigh). Added to run-all.sh. Staged total: ~68 local + 26 agencies.
 
 **Round 203 (done):** Chrome not connected, no API_KEY. Edenton via visitedenton.com (dining/shopping/B&B pages): 6 leads staged in hq-files/add-leads-r203.sh (coffee house, caterer, campground, gourmet shop, B&B, restaurant; emails from own sites). Skipped emails only shown on visitedenton (Chowan Arts, Mill Village Museum) and ehcnc.org (two conflicting emails). Added to run-all.sh. Staged total: ~74 local + 26 agencies.
 
+**Round 204 (done):** Chrome not connected, no API_KEY. Oriental via townoforiental.com/business-directory (links to ~60 sites): 17 leads staged in hq-files/add-leads-r204.sh (restaurant, coffee, 2 B&Bs, 3 lodging, 3 marinas, boat yard/services, charter, realty, spa, barber, contractor, yacht broker; emails from own sites). Skipped Baldheaded Bobby (only email was the web designer's) and Sail Loft Rentals (same firm as Sail Loft Realty). Added to run-all.sh. Staged total: ~91 local + 26 agencies.
+
 **What the next round should do:**
 0. If API_KEY is in the env: `bash hq-files/run-all.sh`, then act on /api/brief
 1. Check /api/brief for any replies
-2. More leads, same method: try Oriental, Plymouth, Hertford, Manteo/Outer Banks visitor-site dining/shopping lists, Beaufort (beaufortnc.org was 403; try other domains). When Chrome connects: Elizabeth City + Goldsboro Wix directories, and Facebook pages of the 22 New Bern sites without emails.
+2. More leads, same method: try Bayboro/Pamlico chamber (pamlicochamber.com), Plymouth, Hertford, Manteo/Outer Banks visitor-site dining/shopping lists, Beaufort (beaufortnc.org was 403; try other domains). When Chrome connects: Elizabeth City + Goldsboro Wix directories, and Facebook pages of the 22 New Bern sites without emails.
 3. Make 6 more Shorts (scripts 13-14 + 4 new original topics, different formats from prev nights)
 4. When Chrome connects: check Facebook pages of Ginger's Boutique + Kwalitstuff (Tarboro) for an email, then send the gbp-offer.md email
 5. Build free website speed/mobile check page (idea bank #5)
