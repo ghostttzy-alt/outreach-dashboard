@@ -211,6 +211,9 @@ model Settings {
   followup2Days Int @default(5) // days after follow-up 1
   coldAfterDays Int @default(5) // days after follow-up 2 with no reply before the lead is marked Cold
 
+  alertsEnabled Boolean @default(true) // email me the moment a real reply arrives
+  alertEmail    String  @default("") // where alerts go; empty = the connected Gmail
+
   paused       Boolean   @default(false)
   pausedReason String    @default("")
   pausedAt     DateTime?

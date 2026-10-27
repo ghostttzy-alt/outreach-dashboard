@@ -296,6 +296,11 @@ export async function checkReplies(now = new Date()) {
       });
       result.replies++;
       if (reply.category === "Unsubscribe" || reply.category === "Not interested") result.optOuts++;
+      const lead = await prisma.lead.findUnique({ where: { id: thread.leadId } });
+      if (lead) {
+        const { sendReplyAlert } = await import("./alerts");
+        await sendReplyAlert(reply, lead);
+      }
     }
 
     if (!result.remaining) await prisma.systemState.update({ where: { id: 1 }, data: { lastReplyCheckAt: now, replyCheckError: "" } });

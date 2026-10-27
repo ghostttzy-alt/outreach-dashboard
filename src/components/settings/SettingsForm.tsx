@@ -53,6 +53,8 @@ export function SettingsForm({ settings, system, dnc }: { settings: SettingsDTO;
     followup1Days: String(settings.followup1Days),
     followup2Days: String(settings.followup2Days),
     coldAfterDays: String(settings.coldAfterDays),
+    alertsEnabled: settings.alertsEnabled,
+    alertEmail: settings.alertEmail,
   });
   const [saving, setSaving] = useState(false);
   const set = (k: keyof typeof s) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
@@ -120,6 +122,17 @@ export function SettingsForm({ settings, system, dnc }: { settings: SettingsDTO;
               <Field label="Mailing address (added to cold emails if missing)" className="sm:col-span-2">
                 <Textarea value={s.mailingAddress} onChange={set("mailingAddress")} className="min-h-20" />
               </Field>
+            </div>
+          </Card>
+
+          <Card>
+            <CardHeader title="Reply alerts" description="An email the moment a business replies (not for unsubscribes, bounces or out-of-office)" />
+            <div className="grid gap-3 p-4 sm:grid-cols-2 sm:p-5">
+              <label className="flex items-center gap-2 text-sm sm:col-span-2">
+                <input type="checkbox" checked={s.alertsEnabled} onChange={(e) => setS({ ...s, alertsEnabled: e.target.checked })} className="size-4 accent-[var(--accent)]" />
+                Email me when someone replies
+              </label>
+              <Field label="Send alerts to" className="sm:col-span-2"><Input type="email" value={s.alertEmail} onChange={set("alertEmail")} placeholder={system.gmailEmail || "you@gmail.com"} /></Field>
             </div>
           </Card>
 

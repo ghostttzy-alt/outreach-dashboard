@@ -44,6 +44,8 @@ The Netlify build runs `npm run db:deploy && npm run build`. `db:deploy` applies
 
 **Scheduled functions** live in `netlify/functions/`: `send-tick` (every 2 minutes) and `check-replies` (every 30 minutes). They only run on the published production deploy. Each calls the site's `/api/cron/*` route with a secret derived from the server secret, so they need no extra setup.
 
+**Reply alerts:** when the reply check finds a real reply (not an unsubscribe, bounce or out-of-office), the site emails you right away from the connected Gmail, with the reply text, the lead's phone and mockup, and a link to the lead. Turn it off or send alerts to another address in **Settings → Reply alerts**. Alerts are sent from your own address, so reply checking never treats them as replies.
+
 ## How it works
 
 ### Pages

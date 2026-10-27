@@ -113,6 +113,8 @@ export const SETTINGS_FIELDS: Spec = {
   followup1Days: { kind: "int", min: 1, max: 60 },
   followup2Days: { kind: "int", min: 1, max: 60 },
   coldAfterDays: { kind: "int", min: 1, max: 60 },
+  alertsEnabled: { kind: "bool" },
+  alertEmail: str(),
   paused: { kind: "bool" },
 };
 
