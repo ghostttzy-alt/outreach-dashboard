@@ -56,6 +56,7 @@ Night 1 summary (base):
 - Town gov sites with a /business-directory page (townoforiental.com) are gold: one fetch gives 60 outbound business links (r204)
 - Webflow chamber sites (pamlicochamber.com/members) serve every member page to curl; fetch all in parallel, then grep each member's own site (r205)
 - Dead ends r206: visitperquimans.com (Wix, only 2 biz sites, no emails on them), visitplymouthnc.com 403, townofhertford/perquimanschamber/plymouthnc/townofmanteo/downtownmanteo don't resolve or 403. Next try windsornc.com (35 outbound links)
+- windsornc.com has no business directory (r207): /things-to-do only links 4 nonprofits, other directory paths 404. Skip Windsor.
 - Only tick YouTube "altered or synthetic content" for realistic fake people/events, not just for an AI voice
 
 ## Idea Bank Progress (20 per night)
@@ -112,10 +113,14 @@ Night 1 summary (base):
 
 **Round 206 (done, no new leads):** Hertford/Plymouth/Manteo sources were dead ends (see Lessons). Staged total unchanged: ~102 local + 26 agencies.
 
+**Round 207 (done, no new leads):** short round; windsornc.com dead end (see Lessons). Staged total unchanged.
+
+**Round 207 (blocked):** API_KEY in ~/.autopilot-env was rejected (401) by /api/brief, so no run-all, replies check or approvals happened. Ghost must re-save the real key (README line ~272), then next round resumes at step 0.
+
 **What the next round should do:**
 0. If API_KEY is in the env: `bash hq-files/run-all.sh`, then act on /api/brief
 1. Check /api/brief for any replies
-2. More leads, same method: start with windsornc.com (Windsor, Bertie Co: 35 outbound links), then Outer Banks (outerbanks.org dining lists), Beaufort (beaufortnc.org was 403; try other domains). When Chrome connects: Elizabeth City + Goldsboro Wix directories, and Facebook pages of the 22 New Bern sites without emails.
+2. More leads, same method: start with Outer Banks (outerbanks.org dining lists), Beaufort (beaufortnc.org was 403; try other domains). When Chrome connects: Elizabeth City + Goldsboro Wix directories, and Facebook pages of the 22 New Bern sites without emails.
 3. Make 6 more Shorts (scripts 13-14 + 4 new original topics, different formats from prev nights)
 4. When Chrome connects: check Facebook pages of Ginger's Boutique + Kwalitstuff (Tarboro) for an email, then send the gbp-offer.md email
 5. Build free website speed/mobile check page (idea bank #5)
