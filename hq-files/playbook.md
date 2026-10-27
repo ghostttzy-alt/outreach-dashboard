@@ -55,6 +55,7 @@ Night 1 summary (base):
 - downtownkinston.com has no business directory (404); swansboro-nc.org is the town gov site. visitedenton.com lists works well (r203)
 - Town gov sites with a /business-directory page (townoforiental.com) are gold: one fetch gives 60 outbound business links (r204)
 - Webflow chamber sites (pamlicochamber.com/members) serve every member page to curl; fetch all in parallel, then grep each member's own site (r205)
+- Dead ends r206: visitperquimans.com (Wix, only 2 biz sites, no emails on them), visitplymouthnc.com 403, townofhertford/perquimanschamber/plymouthnc/townofmanteo/downtownmanteo don't resolve or 403. Next try windsornc.com (35 outbound links)
 - Only tick YouTube "altered or synthetic content" for realistic fake people/events, not just for an AI voice
 
 ## Idea Bank Progress (20 per night)
@@ -109,10 +110,12 @@ Night 1 summary (base):
 
 **Round 205 (done):** Chrome not connected, no API_KEY. Pamlico County via pamlicochamber.com/members (129 member pages, Webflow, plain curl works): 11 leads staged in hq-files/add-leads-r205.sh (pharmacy, florist, law firm, insurance, 2 realty, brewery, pest control, appliance store, 2 marinas; Bayboro/Merritt/Minnesott Beach/Oriental/New Bern; emails from own sites). Skipped r204 dupes, gov/schools/chains, Black Sheep Signs (email domain differs from site). 5 members have NO website (Daily Bread Christian Bookstore, Delamar & Delamar, Diversified Auto & Tire, Flockhart Grocery, Brinson Hauling) = best new-site prospects once an email turns up via Facebook. Staged total: ~102 local + 26 agencies.
 
+**Round 206 (done, no new leads):** Hertford/Plymouth/Manteo sources were dead ends (see Lessons). Staged total unchanged: ~102 local + 26 agencies.
+
 **What the next round should do:**
 0. If API_KEY is in the env: `bash hq-files/run-all.sh`, then act on /api/brief
 1. Check /api/brief for any replies
-2. More leads, same method: try Plymouth, Hertford, Manteo/Outer Banks visitor-site dining/shopping lists, Beaufort (beaufortnc.org was 403; try other domains). When Chrome connects: Elizabeth City + Goldsboro Wix directories, and Facebook pages of the 22 New Bern sites without emails.
+2. More leads, same method: start with windsornc.com (Windsor, Bertie Co: 35 outbound links), then Outer Banks (outerbanks.org dining lists), Beaufort (beaufortnc.org was 403; try other domains). When Chrome connects: Elizabeth City + Goldsboro Wix directories, and Facebook pages of the 22 New Bern sites without emails.
 3. Make 6 more Shorts (scripts 13-14 + 4 new original topics, different formats from prev nights)
 4. When Chrome connects: check Facebook pages of Ginger's Boutique + Kwalitstuff (Tarboro) for an email, then send the gbp-offer.md email
 5. Build free website speed/mobile check page (idea bank #5)
