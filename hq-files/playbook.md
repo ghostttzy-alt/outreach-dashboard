@@ -3,7 +3,7 @@
 > This is Claude's memory across nights. Read this first every night. Keep under 300 lines.
 
 ## What Night Is This?
-Night 2 of operations. Started: 2026-10-27. Last round run: 198 (2026-10-27).
+Night 2 of operations. Started: 2026-10-27. Last round run: 199 (2026-10-27).
 
 ## Channel: college-hacks-for-broke-students
 YouTube niche confirmed: "College hacks for broke students" — I'm a college student so it fits. Track views per format and do more of top 2.
@@ -55,6 +55,7 @@ Night 1 summary (base):
 - The Pillow + ffmpeg pipeline works well: render PNG slides, generate aiff audio, concat
 - curl + grep on an agency's homepage/contact page is the fastest email check; most eastern NC agency sites (17blue, QuistBuilder, New Bern Web Design) hide email behind forms, so skip them
 - Eastern NC lead sources that yield 0 emails (skip): chamber GrowthZone /list pages, visitwilsonnc/visitkinston (JS or 403), bakery sites in Goldsboro, Carteret preferred-caterer PDF (scanned image, 2018), web searches for "@gmail.com"
+- Tarboro/Rocky Mount: discoveredgecombe GrowthZone member pages show websites but no emails; rockymountevents.com catering pages list no outside caterers; Zola/WeddingWire hide emails. Skip these without Chrome.
 - Only tick YouTube "altered or synthetic content" for realistic fake people/events, not just for an AI voice
 
 ## Idea Bank Progress (20 per night)
@@ -77,7 +78,7 @@ Night 1 summary (base):
 14. 24 NC agency leads with real emails + add-agencies.sh script — DONE
 
 ### Night 2 — To Do (from idea bank)
-15. Google Business Profile setup offer — add to email templates
+15. Google Business Profile setup offer — DONE r199 (hq-files/gbp-offer.md, $75, honest limits, only send when a real profile problem is seen)
 16. Free website speed/mobile check email hook
 17. NC local business directory page
 18. Restaurant menu redesign offer + email template
@@ -105,12 +106,14 @@ Night 1 summary (base):
 
 **Round 198 (done):** Chrome not connected, no API_KEY. Lead hunt in Kinston/Wilson/Goldsboro found 0 new emails (sources listed in Lessons). Added hq-files/run-all.sh: one command that checks the key against /api/brief, runs all 5 staged scripts in order (rerun-safe, the API skips duplicates), then prints the brief. Morning summary now points to it.
 
+**Round 199 (done):** Chrome not connected, no API_KEY. Lead hunt (Rocky Mount Event Center, Edgecombe/Tarboro directory, Zola caterers) found 0 new emails. Found 2 Tarboro shops whose listed websites no longer resolve (NXDOMAIN), good "website rescue" + GBP prospects once an email turns up via Facebook in Chrome: Ginger's Boutique (409 N. Main St, gingersboutiquenc.com dead) and Kwalitstuff (kwalitstuff.com dead). Wrote hq-files/gbp-offer.md.
+
 **What the next round should do:**
 0. If API_KEY is in the env: `bash hq-files/run-all.sh`, then act on /api/brief
 0b. For leads, try sources not yet tried: Facebook pages via Chrome (when connected), NC Cooperative Extension county farm/vendor guides, church/venue vendor PDFs that have real text
 1. Check /api/brief for any replies
 2. Find 20+ more eastern NC local business leads with real emails (Kinston, Wilson, Goldsboro, Rocky Mount)
 3. Make 6 more Shorts (scripts 13-14 + 4 new original topics — different formats from prev nights)
-4. Build Google Business Profile setup offer as a new email template
+4. When Chrome connects: check Facebook pages of Ginger's Boutique + Kwalitstuff (Tarboro) for an email, then send the gbp-offer.md email
 5. Build free website speed/mobile check page (idea bank #5)
 6. Test Gumroad listing if Chrome is connected
