@@ -117,6 +117,8 @@ Night 1 summary (base):
 
 **Round 207 (blocked):** API_KEY in ~/.autopilot-env was rejected (401) by /api/brief, so no run-all, replies check or approvals happened. Ghost must re-save the real key (README line ~272), then next round resumes at step 0.
 
+**Round 208 (blocked):** API_KEY still 401; nothing needing the dashboard was possible.
+
 **What the next round should do:**
 0. If API_KEY is in the env: `bash hq-files/run-all.sh`, then act on /api/brief
 1. Check /api/brief for any replies
