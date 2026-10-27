@@ -3,7 +3,7 @@
 > This is Claude's memory across nights. Read this first every night. Keep under 300 lines.
 
 ## What Night Is This?
-Night 2 of operations. Started: 2026-10-27.
+Night 2 of operations. Started: 2026-10-27. Last round run: 197 (2026-10-27).
 
 ## Channel: college-hacks-for-broke-students
 YouTube niche confirmed: "College hacks for broke students" — I'm a college student so it fits. Track views per format and do more of top 2.
@@ -34,7 +34,7 @@ Night 1 summary (base):
 |---|------|-------|--------|
 | 1 | Care plan page at /care | Yes — live | Running |
 | 2 | Etsy listings (3 products) | PDFs made, listing not live | Waiting for Etsy shop |
-| 3 | Agency lead list pitch | 24 agencies staged (add-agencies.sh) | Waiting for API key |
+| 3 | Agency lead list pitch | 26 agencies staged (add-agencies.sh + add-agencies-r197.sh) | Waiting for API key |
 | 4 | YouTube Shorts | 24 total (6 N1 + 18 N2) | Waiting for upload |
 | 5 | /free resources page | Live | Running |
 
@@ -53,6 +53,8 @@ Night 1 summary (base):
 - Keep Shorts to 28–35 seconds — the voice output + slides run longer than you'd expect
 - Different visual styles per video: vary bg color and accent color each night
 - The Pillow + ffmpeg pipeline works well: render PNG slides, generate aiff audio, concat
+- curl + grep on an agency's homepage/contact page is the fastest email check; most eastern NC agency sites (17blue, QuistBuilder, New Bern Web Design) hide email behind forms, so skip them
+- Only tick YouTube "altered or synthetic content" for realistic fake people/events, not just for an AI voice
 
 ## Idea Bank Progress (20 per night)
 ### Night 1 — Built
@@ -98,7 +100,10 @@ Night 1 summary (base):
 3. Open Etsy/Gumroad account → list 3 products from hq-files/etsy/
 4. Connect Gmail to dashboard so outreach starts sending
 
+**Round 197 (done):** Chrome not connected, no API_KEY locally. Added hq-files/add-agencies-r197.sh (EZ Marketing info@ezmarketing.com, Emulent bill@emulent.com), so 26 agencies are staged (goal 25+ met, pending user running the scripts). Fixed the "altered content" advice in morning-summary.md.
+
 **What the next round should do:**
+0. If API_KEY is in the env: run add-leads.sh, add-leads-n2.sh, add-agencies.sh, add-agencies-r197.sh, then check /api/brief
 1. Check /api/brief for any replies
 2. Find 20+ more eastern NC local business leads with real emails (Kinston, Wilson, Goldsboro, Rocky Mount)
 3. Make 6 more Shorts (scripts 13-14 + 4 new original topics — different formats from prev nights)

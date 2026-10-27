@@ -24,7 +24,7 @@ Plus Night 1 originals short1–short6. Total ready: 24 Shorts.
 
 **Upload:** studio.youtube.com → Upload → 3 per day at 8am/1pm/7pm ET.
 Tag: `#collegehacks #brokecollegestudent #studentlife #moneytips #college`
-Tick "Altered or synthetic content" (AI voice used).
+Put "Made with AI voice" in each description. Leave "Altered or synthetic content" unticked (no realistic fake people or events in these videos).
 
 ---
 
@@ -49,6 +49,7 @@ Big Boom Design (Asheville), ELEVEN11 Digital (Fayetteville), and 19 more across
 - Run: `API_KEY=your_key bash hq-files/add-leads.sh`
 - Run: `API_KEY=your_key bash hq-files/add-leads-n2.sh`
 - Run: `API_KEY=your_key bash hq-files/add-agencies.sh`
+- Run: `API_KEY=your_key bash hq-files/add-agencies-r197.sh` (2 more agencies, 26 total)
 - Then check dashboard Approval Queue — review the 24 agency pitch emails
 
 ### 3. Open Etsy + list 3 PDFs (fastest path to $10)
@@ -73,6 +74,11 @@ Big Boom Design (Asheville), ELEVEN11 Digital (Fayetteville), and 19 more across
 
 ## Overnight Build Stats
 - YouTube Shorts created: 18 new (+ 6 Night 1 = 24 total ready)
-- Agencies researched: 24 with verified emails from their own sites
+- Agencies researched: 26 with verified emails from their own sites (24 + EZ Marketing, Emulent added in round 197)
 - Scripts created: add-agencies.sh
 - Build: passing
+
+## Round 197 note (final round of this run)
+- Chrome extension was not connected, so no YouTube uploads or Gumroad listings tonight.
+- There's no API key on this Mac, so I couldn't check /api/brief for replies and no emails were queued. Everything is staged in scripts.
+- $10 goal: not reached. $0 earned, because nothing is listed or sending yet. The fix is your to-dos 1–4 above.
