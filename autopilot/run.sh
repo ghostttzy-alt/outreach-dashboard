@@ -1,10 +1,14 @@
 #!/bin/bash
-# Runs the autopilot in rounds until the time is up.
+# Runs the autopilot in short rounds, with breaks, until the time is up.
 # Usage:  bash autopilot/run.sh 8      (hours to run, default 8)
 # Stop it any time with Ctrl+C.
 
 HOURS="${1:-8}"
-ROUND_MINUTES=60
+ROUND_MINUTES=40
+# Saving Claude usage: a lighter model by default, and a break between rounds.
+# Override with e.g. AUTOPILOT_MODEL=opus or AUTOPILOT_BREAK_MINUTES=0.
+MODEL="${AUTOPILOT_MODEL:-sonnet}"
+BREAK_MINUTES="${AUTOPILOT_BREAK_MINUTES:-20}"
 cd "$(dirname "$0")/.." || exit 1
 
 CLAUDE="$(command -v claude || echo "$HOME/.local/bin/claude")"
@@ -45,10 +49,10 @@ while [ "$(date +%s)" -lt "$END" ]; do
 
   PROMPT="$(cat autopilot/prompt.md)
 
-THIS IS ROUND $ROUND. About $LEFT minutes are left in this run, and this round should take about 45 minutes. Follow ROUND MODE: read hq-files/playbook.md, do the most valuable unfinished work in the PRIORITY ORDER, push, update the playbook, then stop."
+THIS IS ROUND $ROUND. About $LEFT minutes are left in this run, and this round should take 20-30 minutes. Follow ROUND MODE: read hq-files/playbook.md, do the most valuable unfinished work in the PRIORITY ORDER, push, update the playbook, then stop."
 
   ROUND_OUT="$LOG_DIR/.round-output"
-  "$CLAUDE" -p "$PROMPT" $CHROME_FLAG --dangerously-skip-permissions >"$ROUND_OUT" 2>&1 &
+  "$CLAUDE" -p "$PROMPT" --model "$MODEL" $CHROME_FLAG --dangerously-skip-permissions >"$ROUND_OUT" 2>&1 &
   PID=$!
 
   # Stop a round that runs too long, so one stuck round can't eat the night.
@@ -87,7 +91,9 @@ THIS IS ROUND $ROUND. About $LEFT minutes are left in this run, and this round s
   fi
 
   ROUND=$((ROUND + 1))
-  sleep 20
+  if [ "$(( $(date +%s) + BREAK_MINUTES * 60 ))" -ge "$END" ]; then break; fi
+  echo "Resting $BREAK_MINUTES minutes to save Claude usage." | tee -a "$LOG"
+  sleep $((BREAK_MINUTES * 60 + 20))
 done
 
 echo "Autopilot finished. Check https://ghostzy.netlify.app/hq" | tee -a "$LOG"
