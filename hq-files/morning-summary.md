@@ -47,7 +47,7 @@ Big Boom Design (Asheville), ELEVEN11 Digital (Fayetteville), and 19 more across
 ### 2. Get API key + run the scripts
 - Netlify → Site settings → Environment variables → copy API_KEY
 - In Terminal, inside this folder, run ONE command: `API_KEY=your_key bash hq-files/run-all.sh`
-  (it checks the key first, loads all staged leads (now incl. 20 downtown Greenville + 12 downtown New Bern businesses), 26 agencies and logs, and is safe to run twice)
+  (it checks the key first, loads all staged leads (now incl. 20 downtown Greenville + 12 downtown New Bern + 16 downtown Morehead City businesses), 26 agencies and logs, and is safe to run twice)
 - Then check dashboard Approval Queue — review the 24 agency pitch emails
 
 ### 3. Open Etsy + list 3 PDFs (fastest path to $10)
