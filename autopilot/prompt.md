@@ -7,6 +7,8 @@ ROUND MODE (read this first):
 - Push after every finished piece of work, not just at the end.
 - Never redo work that the playbook says is done.
 
+DASHBOARD API: the runner exports $API_KEY (and optionally $SITE, default https://ghostzy.netlify.app) when I've saved them in ~/.autopilot-env. Use them with the x-api-key header for /api/brief, /api/leads, /api/drafts, /api/hq/* and the rest. If staged scripts in hq-files/ haven't been loaded yet, run `bash hq-files/run-all.sh` first (it's safe to re-run). If $API_KEY is empty, put "Save your API key" at the top of my HQ to-do, with the one-line command from the README, and keep going with work that doesn't need it. Never print the key or commit it.
+
 PRIORITY ORDER EACH ROUND (money first, building second):
 1. Replies: check /api/brief. If a business replied, draft a helpful answer, put it at the top of my HQ to-do, and log it. A reply is the closest thing to money.
 2. Fill today's send slots with REAL emails. The bottleneck is leads that have an email address. Go for businesses whose own website or Facebook page shows an email. Aim for at least 2x today's free slots in approved drafts.

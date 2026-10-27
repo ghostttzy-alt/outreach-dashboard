@@ -264,3 +264,17 @@ src/lib/brief.ts            GET /api/brief
 src/lib/leads.ts, drafts.ts duplicate / Do Not Contact / blocklist checks
 src/lib/gmail.ts            Gmail OAuth, sending, reading (REST, no SDK)
 ```
+
+## Autopilot
+
+`bash autopilot/run.sh <hours>` runs Claude Code in rounds of about 45 minutes using `autopilot/prompt.md`. It restarts after dropped connections, waits for Claude usage limits to reset, keeps the Mac awake, and logs to `~/autopilot-logs`.
+
+To let the autopilot use the dashboard API, save the API key once (it stays outside the repo):
+
+```bash
+echo 'export API_KEY=paste-your-key-here' > ~/.autopilot-env
+```
+
+The key is the `API_KEY` environment variable in Netlify (Site configuration → Environment variables).
+
+The Galaxy view at `/hq/galaxy` shows the business as departments of agents around the playbook.
