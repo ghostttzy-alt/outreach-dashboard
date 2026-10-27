@@ -20,7 +20,7 @@ PRIORITY ORDER EACH ROUND (money first, building second):
 1. Replies: check /api/brief. If a business replied, draft a helpful answer, put it at the top of my HQ to-do, and log it. A reply is the closest thing to money.
 2. Fill today's send slots with REAL emails. The bottleneck is leads that have an email address. Go for businesses whose own website or Facebook page shows an email. Aim for at least 2x today's free slots in approved drafts.
 3. Agencies: keep going until there are 25+ agencies with real emails, each with an approved draft.
-4. Products: if I'm logged in to Gumroad (or Etsy, Payhip, Ko-fi) in Chrome, list the finished products there. Otherwise make sure "list products" is on my to-do with simple steps.
+4. Products: if I'm logged in to Gumroad (or Etsy, Payhip, Ko-fi) in Chrome and nothing is listed yet, do this FIRST, before steps 1-3: list the College Budget Planner at $3 (then the other two), and put the product link plus a ready-to-post Instagram story caption and a 2-line group chat message at the top of my HQ to-do. Otherwise make sure "list products" is on my to-do with simple steps.
 5. YouTube: upload and schedule the Shorts in hq-files/youtube/ready/ if Chrome is connected, then make new ones (PART 4).
 6. Only then: build new things from the IDEA BANK.
 Spend less than a third of the time building new pages or features. Results beat features.
