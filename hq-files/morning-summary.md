@@ -46,10 +46,8 @@ Big Boom Design (Asheville), ELEVEN11 Digital (Fayetteville), and 19 more across
 
 ### 2. Get API key + run the scripts
 - Netlify → Site settings → Environment variables → copy API_KEY
-- Run: `API_KEY=your_key bash hq-files/add-leads.sh`
-- Run: `API_KEY=your_key bash hq-files/add-leads-n2.sh`
-- Run: `API_KEY=your_key bash hq-files/add-agencies.sh`
-- Run: `API_KEY=your_key bash hq-files/add-agencies-r197.sh` (2 more agencies, 26 total)
+- In Terminal, inside this folder, run ONE command: `API_KEY=your_key bash hq-files/run-all.sh`
+  (it checks the key first, loads all staged leads, 26 agencies and logs, and is safe to run twice)
 - Then check dashboard Approval Queue — review the 24 agency pitch emails
 
 ### 3. Open Etsy + list 3 PDFs (fastest path to $10)
@@ -82,3 +80,9 @@ Big Boom Design (Asheville), ELEVEN11 Digital (Fayetteville), and 19 more across
 - Chrome extension was not connected, so no YouTube uploads or Gumroad listings tonight.
 - There's no API key on this Mac, so I couldn't check /api/brief for replies and no emails were queued. Everything is staged in scripts.
 - $10 goal: not reached. $0 earned, because nothing is listed or sending yet. The fix is your to-dos 1–4 above.
+
+## Round 198 note
+- Chrome and the API key still weren't available, so nothing was sent or uploaded.
+- Searched Kinston, Wilson and Goldsboro for business emails and found no new real ones (I won't guess emails).
+- Added `hq-files/run-all.sh`, so to-do #2 is now one command.
+- $10 goal: not reached ($0). The blockers are still to-dos 1–4.
