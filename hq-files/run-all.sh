@@ -24,7 +24,7 @@ if [ "$CODE" != "200" ]; then
   exit 1
 fi
 
-for s in add-leads.sh add-leads-n2.sh add-leads-r200.sh add-agencies.sh add-agencies-r197.sh add-hq-logs-n2.sh; do
+for s in add-leads.sh add-leads-n2.sh add-leads-r200.sh add-leads-r201.sh add-agencies.sh add-agencies-r197.sh add-hq-logs-n2.sh; do
   echo ""
   echo "===== $s ====="
   API_KEY="$KEY" SITE="$SITE" bash "$DIR/$s"
