@@ -68,22 +68,33 @@ Night 1 (first night — no prior data):
 19. Social media template pack
 20. Mini-guide: free AI tools for small business owners
 
-## Where I Stopped (Night 1)
-Completed:
-- HQ dashboard built at /hq with 5 venture pages
-- /care page live (public, no auth)
-- API routes: /api/hq/* (overview, ventures, tasks, items, revenue, logs, approve-drafts, leads-export)
-- Migration created: 20261027010000_hq_models
-- 3 Etsy PDFs in hq-files/etsy/
-- 14 YouTube scripts in hq-files/faceless/scripts.md
-- Care plan copy in hq-files/care-plan.md
-- Admin checklist in hq-files/admin-weekly-checklist.md
-- HQ seed script (runs on Netlify deploy)
-- AppShell updated with HQ nav link
+## Night 1 — FULLY COMPLETE (pushed to main, Netlify deploying)
+- HQ dashboard at /hq with 5 venture pages — DONE
+- /care page live (public) — DONE
+- 9 API routes at /api/hq/* — DONE
+- Prisma migration + seed — DONE
+- 3 Etsy PDFs in hq-files/etsy/ — DONE (user still needs to open Etsy shop)
+- 6 YouTube Shorts in hq-files/youtube/ready/ — DONE (user still needs to upload)
+- 14 video scripts in hq-files/faceless/scripts.md — DONE
+- Care plan copy + admin checklist — DONE
+- Agency lead found: lisa@ltwebdesigns.com (LT Web Designs, Enfield NC) — DONE
+- hq-files/add-leads.sh ready for user to run once API key is obtained — DONE
+- hq-files/morning-summary.md written — DONE
+- All pushed to GitHub (commit bd12d73) — DONE
 
-Pending before morning push:
-- [ ] npm run build must pass
-- [ ] Push to main
-- [ ] YouTube Shorts (making them now with ffmpeg)
-- [ ] Agency leads and emails
-- [ ] More local business leads for NC
+## Where I Am Now (autopilot round start)
+This is the autopilot runner. Night 1 code is live on Netlify.
+
+**What still needs the user:**
+1. Open Etsy shop → upload 3 PDFs from hq-files/etsy/
+2. Upload 6 Shorts from hq-files/youtube/ready/ to YouTube Studio
+3. Get API key from Netlify → run hq-files/add-leads.sh to add Night 1 leads
+4. Connect Gmail to dashboard so outreach can start sending
+
+**What the autopilot should do next:**
+1. Check /api/brief for any replies
+2. Find more eastern NC leads with real emails (Greenville, Kinston, Wilson, Goldsboro, Rocky Mount)
+3. Write and approve email drafts for any leads that already have emails
+4. Make 6 new YouTube Shorts (new topics, different formats from Night 1)
+5. Improve /care page or add Gumroad product links if user is logged in
+6. Test 10 more ideas from the idea bank
